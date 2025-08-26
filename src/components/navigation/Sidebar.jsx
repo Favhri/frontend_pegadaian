@@ -78,7 +78,7 @@ const Sidebar = () => {
   return (
     <aside className="w-64 min-h-screen bg-gradient-to-b from-green-800 to-green-600 text-white flex-col hidden md:flex">
       <div className="p-6 text-center border-b border-white/10">
-        <img src="\src\assets\logo-pegadaian-white.svg" alt="logo" />
+        <img src="/src/assets/terndam.png" alt="logo" style={{ width: '150px', height: 'auto', margin: '0 auto' }} />
         {/* <h1 className="text-2xl font-bold flex items-center justify-center gap-2">💎 PEGADAIAN</h1> */}
         {/* <p className="mt-2 text-sm opacity-80">Admin Dashboard v1.0.0</p> */}
       </div>

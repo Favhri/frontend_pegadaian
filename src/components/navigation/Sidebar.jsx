@@ -1,108 +1,135 @@
 // src/components/navigation/Sidebar.jsx
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Swal from 'sweetalert2';
 
-// Komponen NavLink
-const NavLink = ({ to, icon, children, activePath, setActivePath }) => {
-  const navigate = useNavigate();
-  const isActive = activePath.startsWith(to);
+// --- DATA STRUKTUR MENU ---
+const menuItems = [
+    { title: 'Utama', isMenuSection: true },
+    { title: 'Dashboard', icon: '🏠', path: '/admin/dashboard' },
+    { title: 'Manajemen', isMenuSection: true },
+    {
+        title: 'Operasional',
+        icon: '📊',
+        submenu: [
+            { title: 'Input Laporan', path: '/admin/laporan' },
+            { title: 'Arsip Dokumen', path: '/admin/arsip' },
+        ]
+    },
+    {
+        title: 'Sumber Daya',
+        icon: '👥',
+        submenu: [
+            { title: 'Data Cuti', path: '/admin/penentuan-cuti' },
+            { title: 'Manajemen User', path: '/admin/users' },
+            { title: 'Manajemen Agen', path: '/admin/agen' },
+            { title: 'Struktur Organisasi', path: '/admin/struktur-organisasi' },
+        ]
+    },
+];
 
-  const handleClick = (e) => {
-    e.preventDefault();
-    setActivePath(to);
-    navigate(to);
-  };
+// --- KOMPONEN LINK NAVIGASI ---
+const NavLink = ({ to, icon, children, activePath, isExpanded, isSubmenu = false }) => {
+    const navigate = useNavigate();
+    const isActive = activePath.startsWith(to);
 
-  return (
-    <a href={to} onClick={handleClick} className={`flex items-center px-6 py-3 text-white border-l-4 transition-colors duration-200 ${isActive ? 'bg-white/10 border-yellow-400' : 'border-transparent hover:bg-white/10'}`}>
-      <span className="mr-4 text-xl">{icon}</span>
-      <span>{children}</span>
-    </a>
-  );
+    return (
+        <a 
+           href={to} 
+           onClick={(e) => { e.preventDefault(); navigate(to); }} 
+           className={`flex items-center text-white transition-colors duration-200 group relative w-full h-12
+             ${isExpanded ? (isSubmenu ? 'pl-16 pr-4 text-sm' : 'pl-6') : 'justify-center'}`}
+           title={!isExpanded ? children : ''}
+        >
+            <div className={`absolute left-0 h-full w-1 bg-yellow-400 rounded-r-full transition-transform duration-300 ${isActive ? 'scale-y-100' : 'scale-y-0'}`}></div>
+            {icon && <span className="text-2xl">{icon}</span>}
+            {isExpanded && <span className="ml-4 font-medium whitespace-nowrap">{children}</span>}
+        </a>
+    );
 };
-NavLink.propTypes = { to: PropTypes.string.isRequired, icon: PropTypes.string.isRequired, children: PropTypes.string.isRequired, activePath: PropTypes.string.isRequired, setActivePath: PropTypes.func.isRequired };
+NavLink.propTypes = { to: PropTypes.string, icon: PropTypes.string, children: PropTypes.string, activePath: PropTypes.string, isExpanded: PropTypes.bool, isSubmenu: PropTypes.bool };
 
-// Komponen LogoutLink
-const LogoutLink = ({ icon, children, onClick }) => (
-    <a href="#" onClick={onClick} className="flex items-center px-6 py-3 text-white border-l-4 border-transparent hover:bg-white/10 transition-colors duration-200">
-        <span className="mr-4 text-xl">{icon}</span>
-        <span>{children}</span>
-    </a>
-);
-LogoutLink.propTypes = { icon: PropTypes.string.isRequired, children: PropTypes.string.isRequired, onClick: PropTypes.func.isRequired };
+// --- KOMPONEN ACCORDION ---
+const AccordionMenu = ({ title, icon, submenu, activePath, isExpanded }) => {
+    const hasActiveChild = submenu.some(item => activePath.startsWith(item.path));
+    const [isOpen, setIsOpen] = useState(hasActiveChild);
 
-// Komponen MenuSection
-const MenuSection = ({ title }) => (<h3 className="px-6 py-3 text-xs font-bold uppercase text-white/60">{title}</h3>);
-MenuSection.propTypes = { title: PropTypes.string.isRequired };
+    // Efek ini akan membuka/menutup accordion secara otomatis saat
+    // sidebar di-expand/collapse jika ada menu anak yang aktif.
+    useEffect(() => {
+        if (isExpanded) {
+            setIsOpen(hasActiveChild);
+        } else {
+            setIsOpen(false);
+        }
+    }, [isExpanded, hasActiveChild]);
+    
+    return (
+        <div>
+            <button 
+                onClick={() => setIsOpen(!isOpen)} 
+                className={`w-full flex items-center h-12 text-white transition-colors duration-200 group relative
+                  ${isExpanded ? 'pl-6' : 'justify-center'}`}
+                title={!isExpanded ? title : ''}
+                // Accordion hanya bisa di-klik saat sidebar expanded
+                disabled={!isExpanded} 
+            >
+                <div className={`absolute left-0 h-full w-1 bg-yellow-400 rounded-r-full transition-transform duration-300 ${hasActiveChild ? 'scale-y-100' : 'scale-y-0'}`}></div>
+                {icon && <span className="text-2xl">{icon}</span>}
+                {isExpanded && (
+                    <>
+                        <span className="ml-4 font-medium whitespace-nowrap flex-1 text-left">{title}</span>
+                        <span className={`mr-4 transform transition-transform duration-300 text-sm ${isOpen ? 'rotate-180' : 'rotate-0'}`}>▼</span>
+                    </>
+                )}
+            </button>
 
-const Sidebar = () => {
-  const location = useLocation();
-  const [activePath, setActivePath] = useState(location.pathname);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    setActivePath(location.pathname);
-  }, [location.pathname]);
-
-  const handleLogout = (e) => {
-    e.preventDefault();
-    Swal.fire({
-      title: 'Anda yakin ingin logout?',
-      text: "Anda akan diarahkan kembali ke halaman login.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#28a745',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Ya, logout!',
-      cancelButtonText: 'Batal'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        navigate('/login');
-      }
-    });
-  };
-
-  const handleComingSoon = (e) => {
-    e.preventDefault();
-    Swal.fire({
-        title: 'Segera Hadir',
-        text: 'Halaman ini sedang dalam pengembangan.',
-        icon: 'info',
-        confirmButtonColor: '#28a745',
-    });
-  };
-
-  return (
-    <aside className="w-64 min-h-screen bg-gradient-to-b from-green-800 to-green-600 text-white flex-col hidden md:flex">
-      <div className="p-6 text-center border-b border-white/10">
-        <img src="/src/assets/terndam.png" alt="logo" style={{ width: '150px', height: 'auto', margin: '0 auto' }} />
-        {/* <h1 className="text-2xl font-bold flex items-center justify-center gap-2">💎 PEGADAIAN</h1> */}
-        {/* <p className="mt-2 text-sm opacity-80">Admin Dashboard v1.0.0</p> */}
-      </div>
-      <nav className="flex-1 py-4">
-        <MenuSection title="Main" />
-        <NavLink to="/admin/dashboard" icon="🏠" activePath={activePath} setActivePath={setActivePath}>Dashboard</NavLink>
-        
-        <MenuSection title="Manajemen" />
-        <NavLink to="/admin/laporan" icon="📊" activePath={activePath} setActivePath={setActivePath}>Input Laporan</NavLink>
-        <NavLink to="/admin/arsip" icon="📁" activePath={activePath} setActivePath={setActivePath}>Arsip Dokumen</NavLink>
-        <NavLink to="/admin/penentuan-cuti" icon="📅" activePath={activePath} setActivePath={setActivePath}>Penentuan Cuti</NavLink>
-        <a href="#" onClick={handleComingSoon} className="flex items-center px-6 py-3 text-white border-l-4 border-transparent hover:bg-white/10"><span className="mr-4 text-xl">📢</span>Input Pengumuman</a>
-        {/* --- PERBAIKAN DI SINI --- */}
-        <NavLink to="/admin/users" icon="👥" activePath={activePath} setActivePath={setActivePath}>Manajemen User</NavLink>
-        <NavLink to="/admin/agen" icon="🤝" activePath={activePath} setActivePath={setActivePath}>Manajemen Agen</NavLink>
-        <NavLink to="/admin/struktur-organisasi" icon="🤝" activePath={activePath} setActivePath={setActivePath}>Struktur Organisasi</NavLink>
-
-        
-        <MenuSection title="Sistem" />
-        <a href="#" onClick={handleComingSoon} className="flex items-center px-6 py-3 text-white border-l-4 border-transparent hover:bg-white/10"><span className="mr-4 text-xl">⚙️</span>Pengaturan</a>
-        <LogoutLink icon="🚪" onClick={handleLogout}>Logout</LogoutLink>
-      </nav>
-    </aside>
-  );
+            {/* Konten Dropdown Accordion */}
+            <div className={`overflow-hidden transition-all duration-300 ease-in-out bg-black/20 ${isOpen && isExpanded ? 'max-h-96' : 'max-h-0'}`}>
+                {submenu.map(item => <NavLink key={item.path} {...item} activePath={activePath} isExpanded={isExpanded} isSubmenu={true} />)}
+            </div>
+        </div>
+    );
 };
+AccordionMenu.propTypes = { title: PropTypes.string, icon: PropTypes.string, submenu: PropTypes.array, activePath: PropTypes.string, isExpanded: PropTypes.bool };
+
+
+// --- KOMPONEN UTAMA SIDEBAR ---
+const Sidebar = ({ isExpanded, toggleSidebar }) => {
+    const location = useLocation();
+    const [activePath, setActivePath] = useState(location.pathname);
+
+    useEffect(() => {
+        setActivePath(location.pathname);
+    }, [location.pathname]);
+
+    return (
+        <aside className={`bg-green-700 flex flex-col transition-all duration-300 ease-in-out ${isExpanded ? 'w-64' : 'w-20'}`}>
+            <div className={`flex items-center h-20 px-4 border-b border-white/10 ${isExpanded ? 'justify-start' : 'justify-center'}`}>
+                <img src={isExpanded ? "/src/assets/logo-pegadaian-white.svg" : "/vite.svg"} 
+                     alt="logo" 
+                     className={`transition-all duration-300 ${isExpanded ? 'h-10' : 'h-8'}`} />
+            </div>
+
+            <nav className="flex-1 py-4 space-y-1 overflow-y-auto">
+                {menuItems.map((item, index) => {
+                    if (item.isMenuSection) return isExpanded && <h3 key={index} className="px-6 py-2 text-xs font-bold uppercase text-white/60">{item.title}</h3>;
+                    if (item.submenu) return <AccordionMenu key={index} {...item} activePath={activePath} isExpanded={isExpanded} />;
+                    return <NavLink key={index} {...item} activePath={activePath} isExpanded={isExpanded} />;
+                })}
+            </nav>
+            
+            <div className="border-t border-white/10 p-2">
+                <div className="flex justify-center">
+                    <button onClick={toggleSidebar} className="w-12 h-12 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-all duration-300 transform hover:scale-110">
+                        <span className={`transform transition-transform duration-300 ${isExpanded ? '' : 'rotate-180'}`}>❮</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+    );
+};
+Sidebar.propTypes = { isExpanded: PropTypes.bool.isRequired, toggleSidebar: PropTypes.func.isRequired };
 
 export default Sidebar;

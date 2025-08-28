@@ -1,37 +1,32 @@
 @import "tailwindcss";
 /* src/index.css */
-/* @tailwind base; */
-/* @tailwind components; */
 @tailwind utilities;
 
-/* -- CSS Ajaib untuk Struktur Organisasi -- */
-
 .org-chart ul {
-  padding-top: 20px;
+  padding-top: 15px;
   position: relative;
   transition: all 0.5s;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
 }
 
 .org-chart li {
-  float: left;
   text-align: center;
   list-style-type: none;
   position: relative;
-  padding: 20px 5px 0 5px;
+  padding: 15px 5px 0 5px;
   transition: all 0.5s;
 }
 
-/* Garis penghubung */
 .org-chart li::before, .org-chart li::after {
   content: '';
   position: absolute;
   top: 0;
   right: 50%;
-  border-top: 2px solid #a5d6a7; /* Warna hijau muda */
+  border-top: 2px solid #a5d6a7;
   width: 50%;
-  height: 20px;
+  height: 15px;
 }
 
 .org-chart li::after {
@@ -40,7 +35,6 @@
   border-left: 2px solid #a5d6a7;
 }
 
-/* Hapus garis kiri/kanan untuk node yang sendirian atau paling ujung */
 .org-chart li:only-child::after, .org-chart li:only-child::before {
   display: none;
 }
@@ -49,18 +43,15 @@
   border: 0 none;
 }
 
-/* Garis vertikal dari anak terakhir ke kanan */
 .org-chart li:last-child::before {
   border-right: 2px solid #a5d6a7;
   border-radius: 0 5px 0 0;
 }
 
-/* Garis vertikal dari anak pertama ke kiri */
 .org-chart li:first-child::after {
   border-radius: 5px 0 0 0;
 }
 
-/* Garis horizontal yang menyatukan semua anak */
 .org-chart ul ul::before {
   content: '';
   position: absolute;
@@ -68,11 +59,35 @@
   left: 50%;
   border-left: 2px solid #a5d6a7;
   width: 0;
-  height: 20px;
+  height: 15px;
 }
 
-/* Card styling */
 .org-chart li .node-card {
   position: relative;
-  z-index: 1; /* Pastikan card di atas garis */
+  z-index: 1;
+}
+
+/* --- CSS FINAL UNTUK RAHMAT (DIJAMIN NYAMBUNG) --- */
+
+.special-layout-node {
+  /* Biarkan <li> di posisi aslinya agar garis horizontal atas benar */
+  /* Tapi buat ruang kosong di bawahnya untuk card yang akan dipindahkan */
+  margin-bottom: -335px;
+}
+
+.special-layout-node > .node-card {
+  /* Pindahkan HANYA card-nya ke bawah */
+  transform: translateY(335px);
+}
+
+.special-layout-node > .node-card::before {
+  /* Gambar garis vertikal dari card ke posisi aslinya di atas */
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 100%; /* Mulai dari atas card */
+  transform: translateX(-50%);
+  width: 2px;
+  height: 335px; /* Sesuaikan dengan jarak 'translateY' */
+  background-color: #a5d6a7;
 }

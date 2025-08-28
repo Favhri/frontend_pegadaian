@@ -1,56 +1,64 @@
-// src/pages/StrukturOrganisasiPage.jsx
+// src/pages/admin/StrukturOrganisasiPage.jsx
 import React from 'react';
-import TreeNode from "../../components/TreeNode"; // Komponen rekursif yang akan kita buat
+import TreeNode from "../../components/TreeNode";
+import '../../index.css';
 
-// Contoh data struktur organisasi dalam format nested object
 const dataStruktur = {
   id: 1,
   nama: 'Riki Rolando',
-  jabatan: 'Pimpinan Cabang',
-  avatar: 'https://i.pravatar.cc/150?u=dirut',
+  jabatan: 'Pimpinan Kantor Cabang',
+  avatar: 'https://i.pravatar.cc/150?u=pincab',
   children: [
     {
       id: 2,
-      nama: 'Eka Chandra',
-      jabatan: 'Direktur Keuangan',
-      avatar: 'https://i.pravatar.cc/150?u=dirkeu',
+      nama: 'Eka Isra Wahyuli',
+      jabatan: 'Manager Bisnis',
+      avatar: 'https://i.pravatar.cc/150?u=unitbisnis',
       children: [
-        { id: 6, nama: 'Siti Nurhaliza', jabatan: 'Manager Akuntansi', avatar: 'https://i.pravatar.cc/150?u=manakutansi', children: [] },
-        { id: 7, nama: 'Budi Santoso', jabatan: 'Manager Anggaran', avatar: 'https://i.pravatar.cc/150?u=mananggaran', children: [] },
+        { 
+          id: 3, 
+          nama: 'Ahmad Zaelani', 
+          jabatan: 'Kepala Unit Pelayanan Cabang (UPC)', 
+          avatar: 'https://i.pravatar.cc/150?u=upc',
+          children: [
+            { id: 6, nama: 'Putri Wulandari', jabatan: 'Penaksir', avatar: 'https://i.pravatar.cc/150?u=penaksir1', children: [] },
+            { id: 7, nama: 'Gilang Ramadhan', jabatan: 'Pengelola Agunan', avatar: 'https://i.pravatar.cc/150?u=agunan', children: [] },
+            { id: 8, nama: 'Siti Aminah', jabatan: 'Account Officer', avatar: 'https://i.pravatar.cc/150?u=ao1', children: [] },
+            { id: 9, nama: 'Doni Setiawan', jabatan: 'Kasir', avatar: 'https://i.pravatar.cc/150?u=kasir1', children: [] },
+          ]
+        },
+        { 
+          id: 4, 
+          nama: 'Dewi Lestari', 
+          jabatan: 'Kepala Unit Bisnis Non Gadai', 
+          avatar: 'https://i.pravatar.cc/150?u=nongadai',
+          children: [
+            { id: 10, nama: 'Hendra Wijaya', jabatan: 'Account Officer', avatar: 'https://i.pravatar.cc/150?u=ao2', children: [] },
+            { id: 11, nama: 'Maya Indah', jabatan: 'Fungsi KUR', avatar: 'https://i.pravatar.cc/150?u=kur', children: [] },
+          ]
+        },
       ],
     },
     {
-      id: 3,
-      nama: 'Damar Wulan',
-      jabatan: 'Direktur SDM & Logistik',
-      avatar: 'https://i.pravatar.cc/150?u=dirsdm',
-      children: [
-        { id: 8, nama: 'Diana Putri', jabatan: 'Manager Rekrutmen', avatar: 'https://i.pravatar.cc/150?u=manrekrut', children: [] },
-      ],
-    },
-    {
-      id: 4,
-      nama: 'Ridwan Kamil',
-      jabatan: 'Direktur Operasional',
-      avatar: 'https://i.pravatar.cc/150?u=dirops',
-      children: [
-        { id: 9, nama: 'Agus Wijaya', jabatan: 'Manager Produk', avatar: 'https://i.pravatar.cc/150?u=manproduk', children: [] },
-        { id: 10, nama: 'Ahmad Rizki', jabatan: 'Manager Layanan', avatar: 'https://i.pravatar.cc/150?u=manlayan', children: [] },
-      ],
-    },
+      id: 5,
+      nama: 'Rahmat Hidayat',
+      jabatan: 'Operasional Officer',
+      avatar: 'https://i.pravatar.cc/150?u=ops',
+      children: [],
+      layout: 'special-case' 
+    }
   ],
 };
-
 
 const StrukturOrganisasiPage = () => {
   return (
     <div className="bg-white p-8 rounded-lg shadow-md">
-      <h1 className="text-3xl font-bold text-gray-800 mb-2">Struktur Organisasi</h1>
-      <p className="text-gray-500 mb-8">Visualisasi hierarki jabatan di PT. Pegadaian.</p>
-      
-      {/* Container untuk chart, dibuat auto-scroll horizontal jika terlalu lebar */}
+      <div className="text-center mb-10">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Struktur Organisasi Kantor Cabang</h1>
+        <p className="text-gray-500">Visualisasi hierarki jabatan dan penanggung jawab di PT. Pegadaian.</p>
+      </div>
       <div className="overflow-x-auto py-4">
-        <div className="inline-block">
+        <div className="inline-block min-w-full">
           <ul className="org-chart">
             <TreeNode node={dataStruktur} />
           </ul>

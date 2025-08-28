@@ -3,22 +3,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const TreeNode = ({ node }) => {
+  const liClassName = node.layout === 'special-case' ? 'special-layout-node' : '';
+
   return (
-    <li>
-      {/* Card untuk setiap orang */}
-      <div className="node-card w-64 mx-auto bg-white border-2 border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
-        <div className="p-4 text-center">
+    <li className={liClassName}>
+      <div className="node-card w-48 mx-auto bg-white border-2 border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+        <div className="p-3 text-center">
           <img
             src={node.avatar}
             alt={node.nama}
-            className="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-green-200"
+            className="w-16 h-16 rounded-full mx-auto mb-2 border-4 border-green-200"
           />
-          <h3 className="text-lg font-semibold text-gray-800">{node.nama}</h3>
-          <p className="text-sm font-medium text-green-600">{node.jabatan}</p>
+          <h3 className="text-base font-semibold text-gray-800">{node.nama}</h3>
+          <p className="text-xs font-medium text-green-600">{node.jabatan}</p>
         </div>
       </div>
       
-      {/* Render anak-anaknya jika ada */}
       {node.children && node.children.length > 0 && (
         <ul>
           {node.children.map((childNode) => (
@@ -37,6 +37,7 @@ TreeNode.propTypes = {
     jabatan: PropTypes.string.isRequired,
     avatar: PropTypes.string,
     children: PropTypes.array,
+    layout: PropTypes.string,
   }).isRequired,
 };
 

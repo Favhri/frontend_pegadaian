@@ -5,7 +5,7 @@ import SecondaryMenuPanel from '../components/navigation/SecondaryMenuPanel';
 import PropTypes from 'prop-types';
 
 const AdminLayout = ({ children }) => {
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState(null);
 
   const toggleSidebar = () => {

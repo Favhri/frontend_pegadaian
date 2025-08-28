@@ -1,31 +1,27 @@
-// src/layouts/AdminLayout.jsx
-
 import { useState, useEffect } from 'react';
 import Sidebar from '../components/navigation/Sidebar';
 import Header from '../components/navigation/Header';
-import SecondaryMenuPanel from '../components/navigation/SecondaryMenuPanel'; // <-- Import komponen baru
+import SecondaryMenuPanel from '../components/navigation/SecondaryMenuPanel';
 import PropTypes from 'prop-types';
 
 const AdminLayout = ({ children }) => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
-  const [activeSubmenu, setActiveSubmenu] = useState(null); // <-- State untuk panel
+  const [activeSubmenu, setActiveSubmenu] = useState(null);
 
   const toggleSidebar = () => {
-    setIsSidebarExpanded(!isSidebarExpanded);
+    setIsSidebarExpanded(prev => !prev);
   };
 
-  // Fungsi untuk membuka/menutup panel dari sidebar
   const handleAccordionClick = (menuData) => {
     if (!isSidebarExpanded) {
       if (activeSubmenu && activeSubmenu.title === menuData.title) {
-        setActiveSubmenu(null); // Tutup jika yang diklik sama
+        setActiveSubmenu(null);
       } else {
-        setActiveSubmenu(menuData); // Buka yang baru
+        setActiveSubmenu(menuData);
       }
     }
   };
 
-  // Tutup panel jika sidebar di-expand
   useEffect(() => {
     if (isSidebarExpanded) {
       setActiveSubmenu(null);
@@ -37,17 +33,14 @@ const AdminLayout = ({ children }) => {
       <Sidebar 
         isExpanded={isSidebarExpanded} 
         toggleSidebar={toggleSidebar}
-        onAccordionClick={handleAccordionClick} // <-- Kirim fungsi ke sidebar
+        onAccordionClick={handleAccordionClick}
       />
-      
       <main className="flex-1 flex flex-col">
         <Header />
-        <div className="flex-1 relative"> {/* <-- Tambahkan relative di sini */}
-          {/* Panel sekunder akan muncul di sini */}
+        <div className="flex-1 relative">
           {activeSubmenu && (
             <SecondaryMenuPanel menu={activeSubmenu} onClose={() => setActiveSubmenu(null)} />
           )}
-
           <div className="p-6">
             {children}
           </div>

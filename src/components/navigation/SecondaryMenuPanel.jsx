@@ -1,5 +1,3 @@
-// src/components/navigation/SecondaryMenuPanel.jsx
-
 import { useNavigate, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -12,14 +10,12 @@ const SecondaryMenuPanel = ({ menu, onClose }) => {
 
   const handleLinkClick = (path) => {
     navigate(path);
-    onClose(); // Tutup panel setelah link diklik
+    onClose();
   };
 
   return (
-    // Panel container dengan animasi
     <div className="absolute top-0 left-0 h-full w-64 bg-white shadow-lg z-10 animate-slide-in border-r border-gray-200">
       <div className="flex flex-col h-full">
-        {/* Header Panel */}
         <div className="flex items-center justify-between p-4 border-b h-20">
           <h3 className="text-lg font-bold text-gray-800">{menu.title}</h3>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200">
@@ -28,8 +24,6 @@ const SecondaryMenuPanel = ({ menu, onClose }) => {
             </svg>
           </button>
         </div>
-
-        {/* Daftar Link */}
         <nav className="flex-1 p-4 space-y-2">
           {menu.items.map((item, index) => (
             <a

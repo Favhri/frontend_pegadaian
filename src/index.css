@@ -2,21 +2,24 @@
 /* src/index.css */
 @tailwind utilities;
 
+/* Compact Org Chart Styles */
 .org-chart ul {
-  padding-top: 15px;
+  padding-top: 10px; /* Reduced from 15px */
   position: relative;
-  transition: all 0.5s;
+  transition: all 0.3s;
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  flex-wrap: wrap; /* Allow wrapping for better responsiveness */
 }
 
 .org-chart li {
   text-align: center;
   list-style-type: none;
   position: relative;
-  padding: 15px 5px 0 5px;
-  transition: all 0.5s;
+  padding: 8px 3px 0 3px; /* Reduced padding */
+  transition: all 0.3s;
+  margin: 0 2px; /* Add small margin for spacing */
 }
 
 .org-chart li::before, .org-chart li::after {
@@ -24,15 +27,15 @@
   position: absolute;
   top: 0;
   right: 50%;
-  border-top: 2px solid #a5d6a7;
+  border-top: 1px solid #a5d6a7; /* Thinner line */
   width: 50%;
-  height: 15px;
+  height: 10px; /* Reduced from 15px */
 }
 
 .org-chart li::after {
   right: auto;
   left: 50%;
-  border-left: 2px solid #a5d6a7;
+  border-left: 1px solid #a5d6a7; /* Thinner line */
 }
 
 .org-chart li:only-child::after, .org-chart li:only-child::before {
@@ -44,12 +47,12 @@
 }
 
 .org-chart li:last-child::before {
-  border-right: 2px solid #a5d6a7;
-  border-radius: 0 5px 0 0;
+  border-right: 1px solid #a5d6a7;
+  border-radius: 0 3px 0 0;
 }
 
 .org-chart li:first-child::after {
-  border-radius: 5px 0 0 0;
+  border-radius: 3px 0 0 0;
 }
 
 .org-chart ul ul::before {
@@ -57,40 +60,62 @@
   position: absolute;
   top: 0;
   left: 50%;
-  border-left: 2px solid #a5d6a7;
+  border-left: 1px solid #a5d6a7;
   width: 0;
-  height: 15px;
+  height: 10px; /* Reduced from 15px */
 }
 
 .org-chart li .node-card {
   position: relative;
   z-index: 1;
+  /* Compact card styles */
+  min-width: 160px; /* Smaller minimum width */
+  max-width: 180px; /* Prevent cards from getting too wide */
+  margin: 0 auto;
+  padding: 8px 12px; /* Smaller padding */
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 12px; /* Smaller font */
 }
 
-/* --- CSS FINAL UNTUK RAHMAT (DIJAMIN NYAMBUNG) --- */
+.org-chart li .node-card h3 {
+  font-size: 13px; /* Smaller name */
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #1f2937;
+  line-height: 1.2;
+}
 
+.org-chart li .node-card p {
+  font-size: 11px; /* Smaller job title */
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.3;
+}
+
+/* Special layout for Operasional Officer */
 .special-layout-node {
-  /* Biarkan <li> di posisi aslinya agar garis horizontal atas benar */
-  /* Tapi buat ruang kosong di bawahnya untuk card yang akan dipindahkan */
-  margin-bottom: -335px;
+  margin-bottom: -250px; /* Reduced from -335px */
 }
 
 .special-layout-node > .node-card {
-  /* Pindahkan HANYA card-nya ke bawah */
-  transform: translateY(335px);
+  transform: translateY(250px); /* Reduced from 335px */
 }
 
 .special-layout-node > .node-card::before {
-  /* Gambar garis vertikal dari card ke posisi aslinya di atas */
   content: '';
   position: absolute;
   left: 50%;
-  bottom: 100%; /* Mulai dari atas card */
+  bottom: 100%;
   transform: translateX(-50%);
-  width: 2px;
-  height: 335px; /* Sesuaikan dengan jarak 'translateY' */
+  width: 1px; /* Thinner line */
+  height: 250px; /* Match translateY value */
   background-color: #a5d6a7;
 }
+
+/* Animation */
 @keyframes slide-in {
   from {
     transform: translateX(-100%);
@@ -104,4 +129,42 @@
 
 .animate-slide-in {
   animation: slide-in 0.3s ease-out forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .org-chart li .node-card {
+    min-width: 140px;
+    max-width: 160px;
+    font-size: 11px;
+  }
+  
+  .org-chart li .node-card h3 {
+    font-size: 12px;
+  }
+  
+  .org-chart li .node-card p {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .org-chart li {
+    padding: 6px 2px 0 2px;
+  }
+  
+  .org-chart li .node-card {
+    min-width: 120px;
+    max-width: 140px;
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+  
+  .org-chart li .node-card h3 {
+    font-size: 11px;
+  }
+  
+  .org-chart li .node-card p {
+    font-size: 9px;
+  }
 }

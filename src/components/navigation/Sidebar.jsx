@@ -158,7 +158,7 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
     const location = useLocation();
 
     return (
-        <aside className={`bg-green-700 flex flex-col transition-all duration-300 ease-in-out ${
+        <aside className={`bg-green-700 flex flex-col transition-all duration-300 ease-in-out relative ${
             isExpanded ? 'w-64' : 'w-20'
         }`}>
             {/* Header */}
@@ -174,7 +174,7 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
             </div>
             
             {/* Navigation */}
-            <nav className="flex-1 py-4 space-y-1 overflow-y-auto">
+            <nav className="flex-1 py-4 space-y-1 overflow-y-auto pb-20">
                 {menuItems.map((item, index) => {
                     // Render section headers
                     if (item.isMenuSection) {
@@ -217,8 +217,8 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
                 })}
             </nav>
             
-            {/* Toggle Button */}
-            <div className="border-t border-white/10 p-2">
+            {/* Toggle Button - Positioned absolutely at bottom with some margin */}
+            <div className="absolute bottom-4 left-0 right-0 p-2">
                 <div className="flex justify-center">
                     <button 
                         onClick={toggleSidebar} 

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 
 const TreeNode = ({ node }) => {
   const liClassName = node.layout === 'special-case' ? 'special-layout-node' : '';
+  const ulClassName = node.childrenLayout === 'vertical' ? 'vertical-chart' : '';
 
   return (
     <li className={liClassName}>
@@ -15,7 +16,7 @@ const TreeNode = ({ node }) => {
       </div>
       
       {node.children && node.children.length > 0 && (
-        <ul>
+        <ul className={ulClassName}>
           {node.children.map((childNode) => (
             <TreeNode key={childNode.id} node={childNode} />
           ))}
@@ -30,9 +31,10 @@ TreeNode.propTypes = {
     id: PropTypes.number.isRequired,
     nama: PropTypes.string.isRequired,
     jabatan: PropTypes.string.isRequired,
-    avatar: PropTypes.string, // Optional, tidak dipakai lagi
+    avatar: PropTypes.string,
     children: PropTypes.array,
     layout: PropTypes.string,
+    childrenLayout: PropTypes.string,
   }).isRequired,
 };
 

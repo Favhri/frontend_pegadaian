@@ -13,16 +13,17 @@ const dataStruktur = {
       nama: 'Eka Isra Wahyuli',
       jabatan: 'Manager Bisnis',
       children: [
-        { 
-          id: 3, 
-          nama: 'Unit Bisnis', 
-          jabatan: 'Divisi Unit Bisnis', 
+        {
+          id: 3,
+          nama: 'Unit Bisnis',
+          jabatan: 'Divisi Unit Bisnis',
+          childrenLayout: 'vertical', // Ini kunci untuk layout vertikal
           children: [
             // 9 UPC di bawah Unit Bisnis
-            { 
-              id: 4, 
-              nama: 'Ahmad Zaelani', 
-              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 1', 
+            {
+              id: 4,
+              nama: 'Ahmad Zaelani',
+              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 1',
               children: [
                 { id: 5, nama: 'Putri Wulandari', jabatan: 'Penaksir', children: [] },
                 { id: 6, nama: 'Gilang Ramadhan', jabatan: 'Pengelola Agunan', children: [] },
@@ -30,10 +31,10 @@ const dataStruktur = {
                 { id: 8, nama: 'Doni Setiawan', jabatan: 'Kasir', children: [] },
               ]
             },
-            { 
-              id: 9, 
-              nama: 'Budi Santoso', 
-              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 2', 
+            {
+              id: 9,
+              nama: 'Budi Santoso',
+              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 2',
               children: [
                 { id: 10, nama: 'Rina Sari', jabatan: 'Penaksir', children: [] },
                 { id: 11, nama: 'Indra Gunawan', jabatan: 'Pengelola Agunan', children: [] },
@@ -41,10 +42,10 @@ const dataStruktur = {
                 { id: 13, nama: 'Agus Priyanto', jabatan: 'Kasir', children: [] },
               ]
             },
-            { 
-              id: 14, 
-              nama: 'Sari Dewanti', 
-              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 3', 
+            {
+              id: 14,
+              nama: 'Sari Dewanti',
+              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 3',
               children: [
                 { id: 15, nama: 'Yoga Pratama', jabatan: 'Penaksir', children: [] },
                 { id: 16, nama: 'Fitri Handayani', jabatan: 'Pengelola Agunan', children: [] },
@@ -52,10 +53,10 @@ const dataStruktur = {
                 { id: 18, nama: 'Wawan Setiawan', jabatan: 'Kasir', children: [] },
               ]
             },
-            { 
-              id: 19, 
-              nama: 'Toni Kurniawan', 
-              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 4', 
+            {
+              id: 19,
+              nama: 'Toni Kurniawan',
+              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 4',
               children: [
                 { id: 20, nama: 'Diana Sartika', jabatan: 'Penaksir', children: [] },
                 { id: 21, nama: 'Eko Prasetyo', jabatan: 'Pengelola Agunan', children: [] },
@@ -63,10 +64,10 @@ const dataStruktur = {
                 { id: 23, nama: 'Haris Maulana', jabatan: 'Kasir', children: [] },
               ]
             },
-            { 
-              id: 24, 
-              nama: 'Linda Kartika', 
-              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 5', 
+            {
+              id: 24,
+              nama: 'Linda Kartika',
+              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 5',
               children: [
                 { id: 25, nama: 'Ferry Adiputra', jabatan: 'Penaksir', children: [] },
                 { id: 26, nama: 'Mega Utami', jabatan: 'Pengelola Agunan', children: [] },
@@ -74,10 +75,10 @@ const dataStruktur = {
                 { id: 28, nama: 'Citra Dewi', jabatan: 'Kasir', children: [] },
               ]
             },
-            { 
-              id: 29, 
-              nama: 'Joko Widodo', 
-              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 6', 
+            {
+              id: 29,
+              nama: 'Joko Widodo',
+              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 6',
               children: [
                 { id: 30, nama: 'Ayu Lestari', jabatan: 'Penaksir', children: [] },
                 { id: 31, nama: 'Dimas Prasetya', jabatan: 'Pengelola Agunan', children: [] },
@@ -85,10 +86,10 @@ const dataStruktur = {
                 { id: 33, nama: 'Irwan Setyadi', jabatan: 'Kasir', children: [] },
               ]
             },
-            { 
-              id: 34, 
-              nama: 'Maya Sari', 
-              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 7', 
+            {
+              id: 34,
+              nama: 'Maya Sari',
+              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 7',
               children: [
                 { id: 35, nama: 'Rendi Pratama', jabatan: 'Penaksir', children: [] },
                 { id: 36, nama: 'Dewi Anggraeni', jabatan: 'Pengelola Agunan', children: [] },
@@ -96,10 +97,10 @@ const dataStruktur = {
                 { id: 38, nama: 'Lila Safitri', jabatan: 'Kasir', children: [] },
               ]
             },
-            { 
-              id: 39, 
-              nama: 'Reza Fahlevi', 
-              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 8', 
+            {
+              id: 39,
+              nama: 'Reza Fahlevi',
+              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 8',
               children: [
                 { id: 40, nama: 'Vina Oktavia', jabatan: 'Penaksir', children: [] },
                 { id: 41, nama: 'Surya Dinata', jabatan: 'Pengelola Agunan', children: [] },
@@ -107,10 +108,10 @@ const dataStruktur = {
                 { id: 43, nama: 'Fajar Nugraha', jabatan: 'Kasir', children: [] },
               ]
             },
-            { 
-              id: 44, 
-              nama: 'Nita Purnama', 
-              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 9', 
+            {
+              id: 44,
+              nama: 'Nita Purnama',
+              jabatan: 'Kepala Unit Pelayanan Cabang (UPC) 9',
               children: [
                 { id: 45, nama: 'Kevin Pratama', jabatan: 'Penaksir', children: [] },
                 { id: 46, nama: 'Siska Amelia', jabatan: 'Pengelola Agunan', children: [] },
@@ -120,10 +121,10 @@ const dataStruktur = {
             },
           ]
         },
-        { 
-          id: 49, 
-          nama: 'Dewi Lestari', 
-          jabatan: 'Kepala Unit Bisnis Non Gadai', 
+        {
+          id: 49,
+          nama: 'Dewi Lestari',
+          jabatan: 'Kepala Unit Bisnis Non Gadai',
           children: [
             { id: 50, nama: 'Hendra Wijaya', jabatan: 'Account Officer', children: [] },
             { id: 51, nama: 'Maya Indah', jabatan: 'Fungsi KUR', children: [] },

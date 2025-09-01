@@ -4,6 +4,16 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
+// Ambil role user dari localStorage (atau bisa dari context kalau lu pake)
+const getUserRole = () => {
+    try {
+        const user = JSON.parse(localStorage.getItem('user')); 
+        return user?.role || 'user';
+    } catch {
+        return 'user';
+    }
+};
+
 const menuItems = [
     { title: 'Utama', isMenuSection: true },
     { title: 'Dashboard', icon: '🏠', path: '/admin/dashboard' },
@@ -21,7 +31,7 @@ const menuItems = [
         icon: '👥', 
         submenu: [
             { title: 'Data Cuti', path: '/admin/penentuan-cuti' },
-            { title: 'Manajemen User', path: '/admin/users' },
+            { title: 'Manajemen User', path: '/admin/users', onlyAdmin: true },
             { title: 'Manajemen Agen', path: '/admin/agen' },
             { title: 'Struktur Organisasi', path: '/admin/struktur-organisasi' },
         ]
@@ -156,6 +166,7 @@ AccordionMenu.propTypes = {
 
 const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
     const location = useLocation();
+    const role = getUserRole(); // ambil role user yg login
 
     return (
         <aside className={`bg-green-700 flex flex-col transition-all duration-300 ease-in-out relative ${
@@ -170,13 +181,11 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
                     alt="logo" 
                     className={`transition-all duration-300 ${isExpanded ? 'h-10' : 'h-8'}`} 
                 />
-                {/* {isExpanded && <span className="ml-3 text-white font-bold text-lg">Pegadaian</span>} */}
             </div>
             
             {/* Navigation */}
             <nav className="flex-1 py-4 space-y-1 overflow-y-auto pb-20">
                 {menuItems.map((item, index) => {
-                    // Render section headers
                     if (item.isMenuSection) {
                         return isExpanded ? (
                             <h3 
@@ -187,23 +196,31 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
                             </h3>
                         ) : null;
                     }
-                    
-                    // Render accordion menus
+
+                    // Cek apakah item punya submenu
                     if (item.submenu) {
+                        // filter submenu sesuai role
+                        const filteredSubmenu = item.submenu.filter(sub =>
+                            !(sub.onlyAdmin && role !== 'admin')
+                        );
+                        if (filteredSubmenu.length === 0) return null;
+
                         return (
                             <AccordionMenu 
                                 key={`accordion-${index}`} 
                                 title={item.title}
                                 icon={item.icon}
-                                submenu={item.submenu}
+                                submenu={filteredSubmenu}
                                 activePath={location.pathname} 
                                 isExpanded={isExpanded} 
                                 onAccordionClick={onAccordionClick} 
                             />
                         );
                     }
-                    
-                    // Render regular nav links
+
+                    // NavLink biasa (cek kalau ada onlyAdmin)
+                    if (item.onlyAdmin && role !== 'admin') return null;
+
                     return (
                         <NavLink 
                             key={`nav-${index}`} 
@@ -216,8 +233,8 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
                     );
                 })}
             </nav>
-            
-            {/* Toggle Button - Positioned absolutely at bottom with some margin */}
+
+            {/* Toggle button */}
             <div className="absolute bottom-4 left-0 right-0 p-2">
                 <div className="flex justify-center">
                     <button 
@@ -236,6 +253,7 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
         </aside>
     );
 };
+
 
 Sidebar.propTypes = { 
     isExpanded: PropTypes.bool.isRequired, 

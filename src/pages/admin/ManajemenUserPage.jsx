@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import Modal from '../../components/Modal';
-import axios from 'axios';
+import apiClient from '../../api/axios'; 
 
 // --- (Komponen-komponen kecil tidak berubah, jadi saya ringkas) ---
 const PageHeader = ({ title, subtitle, icon }) => (
@@ -40,6 +40,7 @@ AgenIcon.propTypes = { className: PropTypes.string };
 const UserForm = ({ user, onClose, onSave }) => {
     const [formData, setFormData] = useState({
         nama_lengkap: user?.nama_lengkap || '',
+        NIK: user?.NIK || '',
         email: user?.email || '',
         password: '',
         confirmPassword: '',
@@ -67,6 +68,7 @@ const UserForm = ({ user, onClose, onSave }) => {
         const dataToSave = {
             id: user?.id,
             nama_lengkap: formData.nama_lengkap,
+            NIK: formData.NIK, // <-- TAMBAHKAN INI
             email: formData.email,
             role: formData.role
         };
@@ -82,6 +84,7 @@ const UserForm = ({ user, onClose, onSave }) => {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label><input type="text" name="nama_lengkap" value={formData.nama_lengkap} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" required /></div>
+            <div><label className="block text-sm font-medium text-gray-700 mb-1">NIK</label><input type="text" name="nik" value={formData.nik} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" required /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Email</label><input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" required /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Password</label><input type="password" name="password" value={formData.password} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" placeholder={user ? "Kosongkan jika tidak diubah" : ""} /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label><input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" /></div>
@@ -110,8 +113,8 @@ const ManajemenUserPage = () => {
                 return;
             }
             
-            const response = await axios.get('http://localhost:5000/api/users', {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await apiClient.get('/users', { // Gunakan apiClient
+            headers: { Authorization: `Bearer ${token}` }
             });
             
             // PERBAIKAN: Langsung ambil dari response.data.data
@@ -145,12 +148,10 @@ const ManajemenUserPage = () => {
         const headers = { Authorization: `Bearer ${token}` };
         
         try {
-            if (userData.id) { // --- UPDATE ---
-                await axios.put(`http://localhost:5000/api/users/${userData.id}`, userData, { headers });
-                Swal.fire('Berhasil!', 'Data user telah diperbarui.', 'success');
-            } else { // --- CREATE ---
-                await axios.post('http://localhost:5000/api/users', userData, { headers });
-                Swal.fire('Berhasil!', 'User baru telah ditambahkan.', 'success');
+            if (userData.id) {
+             await apiClient.put(`/users/${userData.id}`, userData, { headers }); // Gunakan apiClient
+            } else {
+              await apiClient.post('/users', userData, { headers }); // Gunakan apiClient
             }
             fetchUsers(); // Refresh data
         } catch (err) {
@@ -173,9 +174,9 @@ const ManajemenUserPage = () => {
             if (result.isConfirmed) {
                 try {
                     const token = localStorage.getItem('authToken');
-                    await axios.delete(`http://localhost:5000/api/users/${userId}`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
+                    await apiClient.delete(`/users/${userId}`, { // Gunakan apiClient
+                    headers: { Authorization: `Bearer ${token}` }
+                });
                     Swal.fire('Terhapus!', `${userName} telah dihapus.`, 'success');
                     fetchUsers(); // Refresh data
                 } catch (err) {

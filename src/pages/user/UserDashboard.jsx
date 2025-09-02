@@ -1,12 +1,28 @@
 // src/pages/user/UserDashboard.jsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Import useEffect
 import { DollarSign } from 'lucide-react';
 
 const UserDashboard = () => {
   const [berat, setBerat] = useState('');
   const [kadar, setKadar] = useState('');
   const [hasilEstimasi, setHasilEstimasi] = useState('Masukkan data untuk melihat estimasi pinjaman');
+  const [userName, setUserName] = useState('User'); // State untuk nama user
+  const [userNik, setUserNik] = useState('N/A');   // State untuk NIK user
+
+  useEffect(() => {
+    // Ambil data user dari localStorage saat komponen dimuat
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        setUserName(user.nama_lengkap || 'User');
+        setUserNik(user.nik || 'N/A'); // Asumsi field NIK ada di objek user
+      } catch (error) {
+        console.error("Failed to parse user data from localStorage", error);
+      }
+    }
+  }, []); // [] agar hanya dijalankan sekali setelah render pertama
 
   const hitungGadai = () => {
     const beratNum = parseFloat(berat);
@@ -25,7 +41,14 @@ const UserDashboard = () => {
 
   return (
     <>
-      {/* Dashboard Stats */}
+      {/* Bagian Welcoming Baru */}
+      <div className="bg-gradient-to-r from-green-600 to-green-400 text-white rounded-xl shadow-lg p-6 mb-6">
+        <h1 className="text-3xl font-bold mb-2">Halo, {userName}!</h1>
+        <p className="text-lg">Selamat datang di Dashboard Pegadaian Anda.</p>
+        <p className="text-sm mt-2">NIK Karyawan: {userNik}</p>
+      </div>
+
+      {/* Dashboard Stats (tetap ada di bawah welcoming) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <div className="flex items-center gap-4">
@@ -41,7 +64,7 @@ const UserDashboard = () => {
         {/* Tambahkan kartu statistik lainnya di sini jika perlu */}
       </div>
 
-      {/* Calculator Section */}
+      {/* Calculator Section (tetap di bawah stats) */}
       <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
         <h2 className="text-xl font-bold mb-4">Kalkulator Gadai Emas</h2>
         <div className="max-w-md">
@@ -71,7 +94,7 @@ const UserDashboard = () => {
         </div>
       </div>
 
-      {/* Recent Transactions */}
+      {/* Recent Transactions (tetap di bawah calculator) */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h2 className="text-xl font-bold mb-4">Transaksi Terakhir</h2>
         <div className="overflow-x-auto">

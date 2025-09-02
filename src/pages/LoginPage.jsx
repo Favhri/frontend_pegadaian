@@ -1,11 +1,12 @@
 // src/pages/LoginPage.jsx
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react'; // 1. Import useContext
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import axios from 'axios';
+import apiClient from '../api/axios'; // Pastikan menggunakan apiClient
+import { AuthContext } from '../context/AuthProvider'; // 2. Import AuthContext
 
-// Komponen kecil untuk icon centang di panel kiri
+// Komponen FeatureListItem tidak berubah...
 const FeatureListItem = ({ children }) => (
   <li className="flex items-center gap-3 py-2 text-lg">
     <svg className="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
@@ -18,17 +19,14 @@ FeatureListItem.propTypes = {
 
 
 const LoginPage = () => {
-  // State untuk mengelola input form
-  const [username, setUsername] = useState(''); // Bisa berisi username atau email
+  const { setToken } = useContext(AuthContext); // 3. Ambil fungsi setToken dari context
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  // State untuk menangani proses login (loading, error, success)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,7 +37,6 @@ const LoginPage = () => {
     }
   }, []);
 
-  // --- FUNGSI LOGIN DENGAN API BACKEND ---
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -57,24 +54,23 @@ const LoginPage = () => {
       password: password,
     };
 
-    console.log("Data yang akan dikirim ke backend:", loginPayload);
-
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', loginPayload);
+      // Gunakan apiClient yang sudah dikonfigurasi
+      const response = await apiClient.post('/auth/login', loginPayload);
 
-      // --- PERBAIKAN UTAMA DI SINI ---
-      // Ambil token dan user dari response.data
       const { token, user } = response.data;
 
-      // Jika tidak ada token atau user, anggap login gagal
       if (!token || !user) {
         throw new Error("Respons tidak valid dari server.");
       }
 
-      // Simpan token dan user ke localStorage
+      // Simpan ke localStorage
       localStorage.setItem('authToken', token);
-      localStorage.setItem('user', JSON.stringify(user)); // Simpan objek user sebagai string JSON
+      localStorage.setItem('user', JSON.stringify(user));
       
+      // 4. Perbarui state global di AuthContext
+      setToken(token);
+
       if (rememberMe) {
         localStorage.setItem('pegadaian_remember', username);
       } else {
@@ -83,14 +79,12 @@ const LoginPage = () => {
 
       setSuccess(`Login berhasil! Mengarahkan ke dashboard...`);
       
-      // Arahkan berdasarkan role
       setTimeout(() => {
         if (user.role === 'admin') {
           navigate('/admin/dashboard');
         } else if (user.role === 'user') {
           navigate('/user/dashboard');
         } else {
-          // Arahkan ke halaman default jika rolenya tidak terdefinisi
           navigate('/login');
         }
       }, 1500);
@@ -104,6 +98,7 @@ const LoginPage = () => {
     }
   };
 
+  // ... sisa kode JSX tidak berubah
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-800 via-green-600 to-teal-500 p-4">
       {loading && (
@@ -116,8 +111,6 @@ const LoginPage = () => {
         <div className="hidden md:flex flex-col justify-center p-12 bg-gradient-to-br from-green-700 to-green-600 text-white text-center">
           <div className="flex justify-center items-center gap-4 mb-4">
               <img src="/src/assets/terndam.png" alt="logo" style={{ width: '200px', height: 'auto', margin: '0 auto' }} />
-            {/* <span className="text-6xl">💎</span> */}
-            {/* <h1 className="text-4xl font-bold">PEGADAIAN</h1> */}
           </div>
           <p className="text-xl mb-6">
             Solusi Finansial Terpercaya<br />
@@ -176,7 +169,7 @@ const LoginPage = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 px-4 text-gray-500 hover:text-green-600"
                 >
-                  {showPassword ? '🙈' : '👁️'}
+                  {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>
@@ -201,7 +194,7 @@ const LoginPage = () => {
               disabled={loading}
               className="w-full bg-gradient-to-r from-green-600 to-teal-500 text-white font-bold py-3 px-4 rounded-lg hover:from-green-700 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-transform transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Memproses...' : '🔐 Masuk ke Dashboard'}
+              {loading ? 'Memproses...' : 'Masuk ke Dashboard'}
             </button>
           </form>
         </div>

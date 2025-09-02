@@ -2,7 +2,7 @@
 import React, { createContext, useEffect, useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import apiClient from "../api/axios";
 
 export const AuthContext = createContext();
 
@@ -49,15 +49,13 @@ export const AuthProvider = ({ children }) => {
       }
 
       try {
-        // Panggil endpoint refresh token kalau user masih aktif
-        await axios.post("http://localhost:5000/api/auth/refresh-token", {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        }).then(res => {
-          if (res.data?.token) {
-            localStorage.setItem("authToken", res.data.token);
-            setToken(res.data.token);
-          }
-        });
+    // Panggil endpoint refresh token
+    const res = await apiClient.post("/auth/refresh-token"); // Gunakan apiClient, tidak perlu header/body
+    
+    if (res.data?.token) {
+        localStorage.setItem("authToken", res.data.token);
+        setToken(res.data.token);
+    }
       } catch (err) {
         console.error("Token refresh gagal:", err);
         localStorage.removeItem("authToken");

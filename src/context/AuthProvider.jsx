@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         // Panggil endpoint refresh token kalau user masih aktif
-        await axios.post("http://localhost:5000/api/auth/refresh", {}, {
+        await axios.post("http://localhost:5000/api/auth/refresh-token", {}, {
           headers: { Authorization: `Bearer ${token}` }
         }).then(res => {
           if (res.data?.token) {

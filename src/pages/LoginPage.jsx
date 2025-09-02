@@ -63,15 +63,17 @@ const LoginPage = () => {
       const response = await axios.post('http://localhost:5000/api/auth/login', loginPayload);
 
       // --- PERBAIKAN UTAMA DI SINI ---
-      // Kita hanya mengambil 'token' karena backend tidak mengirim 'user'
-      const { token } = response.data;
+      // Ambil token dan user dari response.data
+      const { token, user } = response.data;
 
-      // Jika tidak ada token, anggap login gagal
-      if (!token) {
+      // Jika tidak ada token atau user, anggap login gagal
+      if (!token || !user) {
         throw new Error("Respons tidak valid dari server.");
       }
 
+      // Simpan token dan user ke localStorage
       localStorage.setItem('authToken', token);
+      localStorage.setItem('user', JSON.stringify(user)); // Simpan objek user sebagai string JSON
       
       if (rememberMe) {
         localStorage.setItem('pegadaian_remember', username);
@@ -81,10 +83,16 @@ const LoginPage = () => {
 
       setSuccess(`Login berhasil! Mengarahkan ke dashboard...`);
       
-      // Karena kita tidak mendapat role, untuk sekarang semua login berhasil
-      // akan diarahkan ke dashboard admin.
+      // Arahkan berdasarkan role
       setTimeout(() => {
-        navigate('/admin/dashboard');
+        if (user.role === 'admin') {
+          navigate('/admin/dashboard');
+        } else if (user.role === 'user') {
+          navigate('/user/dashboard');
+        } else {
+          // Arahkan ke halaman default jika rolenya tidak terdefinisi
+          navigate('/login');
+        }
       }, 1500);
 
     } catch (err) {

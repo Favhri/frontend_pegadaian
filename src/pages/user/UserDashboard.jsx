@@ -17,7 +17,7 @@ const UserDashboard = () => {
       try {
         const user = JSON.parse(storedUser);
         setUserName(user.nama_lengkap || 'User');
-        setUserNik(user.nik || 'N/A'); // Asumsi field NIK ada di objek user
+        setUserNik(user.NIK || 'N/A'); // Asumsi field NIK ada di objek user
       } catch (error) {
         console.error("Failed to parse user data from localStorage", error);
       }
@@ -45,7 +45,7 @@ const UserDashboard = () => {
       <div className="bg-gradient-to-r from-green-600 to-green-400 text-white rounded-xl shadow-lg p-6 mb-6">
         <h1 className="text-3xl font-bold mb-2">Halo, {userName}!</h1>
         <p className="text-lg">Selamat datang di Dashboard Pegadaian Anda.</p>
-        <p className="text-sm mt-2">NIK Karyawan: {userNik}</p>
+        <p className="text-sm mt-2">NIK : {userNik}</p>
       </div>
 
       {/* Dashboard Stats (tetap ada di bawah welcoming) */}

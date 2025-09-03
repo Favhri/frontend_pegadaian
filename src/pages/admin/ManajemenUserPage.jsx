@@ -24,7 +24,7 @@ const StatsCard = ({ title, value, icon, color }) => (
     </div>
 );
 StatsCard.propTypes = { title: PropTypes.string, value: PropTypes.string, icon: PropTypes.node, color: PropTypes.string };
-const UserGroupIcon = (props) => (<svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>);
+const UserGroupIcon = (props) => (<svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283-.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>);
 UserGroupIcon.propTypes = { className: PropTypes.string };
 const AdminIcon = (props) => (<svg {...props} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>);
 AdminIcon.propTypes = { className: PropTypes.string };
@@ -38,13 +38,14 @@ AgenIcon.propTypes = { className: PropTypes.string };
 
 // --- FORM UNTUK MODAL ---
 const UserForm = ({ user, onClose, onSave }) => {
+    // Gunakan 'NIK' (uppercase) di state
     const [formData, setFormData] = useState({
         nama_lengkap: user?.nama_lengkap || '',
-        NIK: user?.NIK || '',
         email: user?.email || '',
         password: '',
         confirmPassword: '',
         role: user?.role || 'user',
+        NIK: user?.NIK || '', // <-- KONSISTEN DENGAN HURUF BESAR
     });
 
     const handleChange = (e) => {
@@ -65,12 +66,13 @@ const UserForm = ({ user, onClose, onSave }) => {
             return;
         }
 
+        // Kirim 'NIK' (uppercase) saat menyimpan
         const dataToSave = {
             id: user?.id,
             nama_lengkap: formData.nama_lengkap,
-            NIK: formData.NIK, // <-- TAMBAHKAN INI
             email: formData.email,
-            role: formData.role
+            role: formData.role,
+            NIK: formData.NIK, // <-- KONSISTEN DENGAN HURUF BESAR
         };
 
         if (formData.password) {
@@ -84,7 +86,10 @@ const UserForm = ({ user, onClose, onSave }) => {
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label><input type="text" name="nama_lengkap" value={formData.nama_lengkap} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" required /></div>
-            <div><label className="block text-sm font-medium text-gray-700 mb-1">NIK</label><input type="text" name="nik" value={formData.nik} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" required /></div>
+            
+            {/* Gunakan 'NIK' (uppercase) untuk name dan value */}
+            <div><label className="block text-sm font-medium text-gray-700 mb-1">NIK</label><input type="text" name="NIK" value={formData.NIK} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" required /></div>
+            
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Email</label><input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" required /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Password</label><input type="password" name="password" value={formData.password} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" placeholder={user ? "Kosongkan jika tidak diubah" : ""} /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label><input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" /></div>
@@ -113,11 +118,10 @@ const ManajemenUserPage = () => {
                 return;
             }
             
-            const response = await apiClient.get('/users', { // Gunakan apiClient
-            headers: { Authorization: `Bearer ${token}` }
+            const response = await apiClient.get('/users', {
+                headers: { Authorization: `Bearer ${token}` }
             });
             
-            // PERBAIKAN: Langsung ambil dari response.data.data
             const formattedUsers = response.data.data.map(user => ({
                 ...user,
                 tglBergabung: new Date(user.created_at).toLocaleDateString('id-ID')
@@ -149,11 +153,11 @@ const ManajemenUserPage = () => {
         
         try {
             if (userData.id) {
-             await apiClient.put(`/users/${userData.id}`, userData, { headers }); // Gunakan apiClient
+             await apiClient.put(`/users/${userData.id}`, userData, { headers });
             } else {
-              await apiClient.post('/users', userData, { headers }); // Gunakan apiClient
+              await apiClient.post('/users', userData, { headers });
             }
-            fetchUsers(); // Refresh data
+            fetchUsers();
         } catch (err) {
             console.error('Gagal menyimpan user:', err.response?.data || err.message);
             Swal.fire('Error!', err.response?.data?.message || 'Gagal menyimpan data.', 'error');
@@ -174,11 +178,11 @@ const ManajemenUserPage = () => {
             if (result.isConfirmed) {
                 try {
                     const token = localStorage.getItem('authToken');
-                    await apiClient.delete(`/users/${userId}`, { // Gunakan apiClient
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                    await apiClient.delete(`/users/${userId}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
                     Swal.fire('Terhapus!', `${userName} telah dihapus.`, 'success');
-                    fetchUsers(); // Refresh data
+                    fetchUsers();
                 } catch (err) {
                     console.error('Gagal menghapus user:', err.response?.data || err.message);
                     Swal.fire('Error!', err.response?.data?.message || 'Gagal menghapus data.', 'error');
@@ -231,6 +235,7 @@ const ManajemenUserPage = () => {
                                             <div className="font-medium text-gray-900">{user.nama_lengkap}</div>
                                             <div className="text-xs text-gray-500">{user.email}</div>
                                         </td>
+                                        {/* <td className="px-6 py-4">{user.NIK}</td> */}
                                         <td className="px-6 py-4 capitalize">{user.role}</td>
                                         <td className="px-6 py-4">{user.tglBergabung}</td>
                                         <td className="px-6 py-4 text-center flex gap-2 justify-center">

@@ -3,24 +3,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
+import apiClient from '../../api/axios';
 
-// --- DATA DUMMY ---
-const dummyCutiData = [
-    { id: 1, pegawai: 'Ahmad Rizki Pratama', nip: '001', jenis: 'tahunan', tanggalMulai: '2024-12-15', tanggalSelesai: '2024-12-20', durasi: 5, status: 'approved', alasan: 'Liburan keluarga akhir tahun' },
-    { id: 2, pegawai: 'Siti Nurhaliza', nip: '002', jenis: 'sakit', tanggalMulai: '2024-12-10', tanggalSelesai: '2024-12-12', durasi: 3, status: 'pending', alasan: 'Sakit demam tinggi' },
-    { id: 3, pegawai: 'Budi Santoso', nip: '003', jenis: 'alasan-penting', tanggalMulai: '2024-12-08', tanggalSelesai: '2024-12-08', durasi: 1, status: 'approved', alasan: 'Menghadiri acara keluarga' },
-    { id: 4, pegawai: 'Maya Sari', nip: '004', jenis: 'melahirkan', tanggalMulai: '2024-11-01', tanggalSelesai: '2025-01-30', durasi: 90, status: 'approved', alasan: 'Cuti melahirkan anak pertama' },
-    { id: 5, pegawai: 'Dedi Kurniawan', nip: '005', jenis: 'tahunan', tanggalMulai: '2024-12-23', tanggalSelesai: '2024-12-31', durasi: 8, status: 'pending', alasan: 'Liburan natal dan tahun baru' },
-];
-const dummyPegawai = [
-    { id: "001", nama: "Ahmad Rizki Pratama" },
-    { id: "002", nama: "Siti Nurhaliza" },
-    { id: "003", nama: "Budi Santoso" },
-    { id: "004", nama: "Maya Sari" },
-    { id: "005", nama: "Dedi Kurniawan" },
-];
-
-// --- KOMPONEN-KOMPONEN KECIL ---
+// --- KOMPONEN-KOMPONEN KECIL (UI Elements) ---
 
 const StatsCard = ({ icon, number, label }) => (
     <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 text-center relative overflow-hidden">
@@ -49,18 +34,17 @@ const FormInput = ({ label, icon, children }) => (
 );
 FormInput.propTypes = { label: PropTypes.string, icon: PropTypes.string, children: PropTypes.node };
 
-
-// --- KOMPONEN FORM CUTI ---
-const CutiForm = ({ onAddCuti }) => {
+// --- FORM CUTI (MENGGUNAKAN DATA MASTER PEGAWAI) ---
+const CutiForm = ({ onAddCuti, pegawaiList }) => {
     const [formData, setFormData] = useState({
         pegawai: '',
+        NIK: '',
         jenis: '',
         tanggalMulai: '',
         tanggalSelesai: '',
         durasi: '',
-        status: 'pending',
         alasan: '',
-        catatan: ''
+        selectedPegawaiId: '',
     });
 
     useEffect(() => {
@@ -76,6 +60,21 @@ const CutiForm = ({ onAddCuti }) => {
             }
         }
     }, [formData.tanggalMulai, formData.tanggalSelesai]);
+    
+    const handlePegawaiChange = (e) => {
+        const selectedId = e.target.value;
+        const selectedPegawai = pegawaiList.find(p => p.id.toString() === selectedId);
+        if (selectedPegawai) {
+            setFormData(prev => ({
+                ...prev,
+                pegawai: selectedPegawai.nama_lengkap,
+                NIK: selectedPegawai.NIK,
+                selectedPegawaiId: selectedId
+            }));
+        } else {
+             setFormData(prev => ({ ...prev, pegawai: '', NIK: '', selectedPegawaiId: ''}));
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -84,24 +83,16 @@ const CutiForm = ({ onAddCuti }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const newCuti = {
-            id: Date.now(),
-            ...formData,
-            pegawai: dummyPegawai.find(p => p.id === formData.pegawai)?.nama || 'Unknown'
-        };
-        onAddCuti(newCuti);
-        Swal.fire('Berhasil!', 'Data cuti baru telah ditambahkan.', 'success');
-        // Reset form
-        setFormData({ pegawai: '', jenis: '', tanggalMulai: '', tanggalSelesai: '', durasi: '', status: 'pending', alasan: '', catatan: '' });
+        onAddCuti(formData);
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid md:grid-cols-2 gap-6">
-                <FormInput label="Nama Pegawai" icon="�">
-                    <select name="pegawai" value={formData.pegawai} onChange={handleChange} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" required>
-                        <option value="">Pilih Pegawai</option>
-                        {dummyPegawai.map(p => <option key={p.id} value={p.id}>{p.nama} - NIP: {p.id}</option>)}
+                <FormInput label="Nama Pegawai" icon="👤">
+                    <select name="pegawai" value={formData.selectedPegawaiId} onChange={handlePegawaiChange} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" required>
+                        <option value="">Pilih dari Data Master Pegawai</option>
+                        {pegawaiList.map(p => <option key={p.id} value={p.id}>{p.nama_lengkap} - NIK: {p.NIK}</option>)}
                     </select>
                 </FormInput>
                 <FormInput label="Jenis Cuti" icon="📝">
@@ -115,42 +106,96 @@ const CutiForm = ({ onAddCuti }) => {
                     </select>
                 </FormInput>
                 <FormInput label="Tanggal Mulai Cuti" icon="📅">
-                    <input type="date" name="tanggalMulai" value={formData.tanggalMulai} onChange={handleChange} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" required />
+                    <input type="date" name="tanggalMulai" value={formData.tanggalMulai} onChange={handleChange} className="w-full p-3 border-2 border-gray-200 rounded-lg" required />
                 </FormInput>
                 <FormInput label="Tanggal Selesai Cuti" icon="📅">
-                    <input type="date" name="tanggalSelesai" value={formData.tanggalSelesai} onChange={handleChange} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" required />
+                    <input type="date" name="tanggalSelesai" value={formData.tanggalSelesai} onChange={handleChange} className="w-full p-3 border-2 border-gray-200 rounded-lg" required />
                 </FormInput>
-                <FormInput label="Jumlah Hari" icon="📊">
-                    <input type="number" name="durasi" value={formData.durasi} className="w-full p-3 border-2 border-gray-200 rounded-lg bg-gray-100" readOnly placeholder="Otomatis terhitung" />
-                </FormInput>
-                <FormInput label="Status Persetujuan" icon="✅">
-                    <select name="status" value={formData.status} onChange={handleChange} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" required>
-                        <option value="pending">⏳ Pending (Menunggu)</option>
-                        <option value="approved">✅ Disetujui</option>
-                        <option value="rejected">❌ Ditolak</option>
-                    </select>
-                </FormInput>
+                <div className="md:col-span-2">
+                    <FormInput label="Jumlah Hari" icon="📊">
+                        <input type="number" name="durasi" value={formData.durasi} className="w-full p-3 border-2 border-gray-200 rounded-lg bg-gray-100" readOnly placeholder="Otomatis terhitung" />
+                    </FormInput>
+                </div>
             </div>
             <FormInput label="Alasan/Keperluan Cuti" icon="📝">
-                <textarea name="alasan" value={formData.alasan} onChange={handleChange} rows="4" className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" placeholder="Jelaskan alasan atau keperluan cuti..." required></textarea>
-            </FormInput>
-            <FormInput label="Catatan Admin" icon="📋">
-                <textarea name="catatan" value={formData.catatan} onChange={handleChange} rows="4" className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" placeholder="Catatan atau keterangan tambahan dari admin..."></textarea>
+                <textarea name="alasan" value={formData.alasan} onChange={handleChange} rows="4" className="w-full p-3 border-2 border-gray-200 rounded-lg" placeholder="Jelaskan alasan atau keperluan cuti..." required></textarea>
             </FormInput>
             <div className="flex gap-4 pt-4">
                 <button type="submit" className="px-6 py-3 font-bold text-white bg-gradient-to-r from-green-600 to-teal-500 rounded-lg hover:opacity-90 transition">💾 Simpan Data Cuti</button>
-                <button type="reset" onClick={() => setFormData({ pegawai: '', jenis: '', tanggalMulai: '', tanggalSelesai: '', durasi: '', status: 'pending', alasan: '', catatan: '' })} className="px-6 py-3 font-bold text-white bg-gray-500 rounded-lg hover:opacity-90 transition">🔄 Reset Form</button>
             </div>
         </form>
     );
 };
-CutiForm.propTypes = { onAddCuti: PropTypes.func };
+CutiForm.propTypes = { onAddCuti: PropTypes.func.isRequired, pegawaiList: PropTypes.array.isRequired };
+
+// --- KALENDER VIEW ---
+const CutiCalendarView = ({ cutiList, loading }) => {
+    const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+
+    if (loading) return <p className="text-center p-8">Memuat kalender...</p>;
+
+    return (
+        <div className="p-6">
+            <h2 className="text-2xl font-bold text-green-800 mb-6">Kalender Cuti Karyawan</h2>
+            <div className="space-y-3">
+                {cutiList.length > 0 ? cutiList.map(item => (
+                    <div key={item.id} className="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg flex items-center justify-between flex-wrap gap-2">
+                        <div>
+                            <p className="font-bold text-green-900">{item.pegawai}</p>
+                            <p className="text-sm text-green-700 capitalize">{item.jenis}</p>
+                        </div>
+                        <p className="font-semibold text-green-800 text-sm">
+                           {formatDate(item.tanggalMulai)} - {formatDate(item.tanggalSelesai)}
+                        </p>
+                    </div>
+                )) : <p className="text-center text-gray-500 p-4">Tidak ada jadwal cuti untuk ditampilkan.</p>}
+            </div>
+        </div>
+    );
+};
+CutiCalendarView.propTypes = { cutiList: PropTypes.array.isRequired, loading: PropTypes.bool.isRequired };
 
 // --- KOMPONEN UTAMA HALAMAN ---
 const PenentuanCutiPage = () => {
     const [activeTab, setActiveTab] = useState('input');
-    const [cutiList, setCutiList] = useState(dummyCutiData);
+    const [cutiList, setCutiList] = useState([]);
+    const [pegawaiList, setPegawaiList] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(true);
+
+    const fetchAllCuti = async () => {
+        setLoading(true);
+        try {
+            const response = await apiClient.get('/cuti');
+            if (response.data.success) {
+                setCutiList(response.data.data);
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Gagal memuat data cuti.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchPegawai = async () => {
+        try {
+            const response = await apiClient.get('/pegawai');
+            if (response.data.success) {
+                setPegawaiList(response.data.data);
+            }
+        } catch (err) {
+            console.error("Gagal mengambil data pegawai:", err);
+            Swal.fire('Error', 'Gagal memuat daftar pegawai.', 'error');
+        }
+    };
+    
+    useEffect(() => {
+        if (activeTab === 'input') {
+            if (pegawaiList.length === 0) fetchPegawai();
+        } else {
+            fetchAllCuti();
+        }
+    }, [activeTab]);
 
     const filteredData = useMemo(() => {
         return cutiList.filter(item => 
@@ -161,39 +206,35 @@ const PenentuanCutiPage = () => {
     const stats = useMemo(() => {
         const today = new Date();
         return {
-            totalPegawai: 145,
-            cutiAktif: cutiList.filter(c => new Date(c.tanggalMulai) <= today && new Date(c.tanggalSelesai) >= today && c.status === 'approved').length,
-            cutiPending: cutiList.filter(c => c.status === 'pending').length,
-            cutiSelesaiBulanIni: cutiList.filter(c => new Date(c.tanggalSelesai).getMonth() === today.getMonth() && c.status === 'approved').length,
-        }
-    }, [cutiList]);
+            totalPegawai: pegawaiList.length,
+            cutiAktif: cutiList.filter(c => new Date(c.tanggalMulai) <= today && new Date(c.tanggalSelesai) >= today).length,
+            totalCuti: cutiList.length,
+        };
+    }, [cutiList, pegawaiList]);
 
-    const getStatusBadge = (status) => {
-        switch (status) {
-            case 'approved': return 'bg-green-100 text-green-800';
-            case 'pending': return 'bg-yellow-100 text-yellow-800';
-            case 'rejected': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
+    const handleAddCuti = async (newCutiData) => {
+        try {
+            const response = await apiClient.post('/cuti', newCutiData);
+            if (response.data.success) {
+                Swal.fire('Berhasil!', 'Data cuti baru telah ditambahkan.', 'success');
+                setActiveTab('view'); // Pindah ke tab view untuk melihat hasilnya
+            }
+        } catch (error) {
+             Swal.fire('Error', error.response?.data?.message || 'Gagal menyimpan data cuti.', 'error');
         }
-    };
-
-    const handleAddCuti = (newCuti) => {
-        setCutiList(prevList => [newCuti, ...prevList]);
-        setActiveTab('view'); // Pindah ke tab view setelah berhasil submit
     };
 
     return (
         <div className="space-y-8">
             <div className="text-center bg-gradient-to-r from-green-700 to-green-600 text-white p-8 rounded-2xl shadow-xl">
-                <h1 className="text-4xl font-bold">📅 Penentuan Cuti Pegawai</h1>
-                <p className="mt-2 text-lg opacity-90">Kelola dan pantau data cuti pegawai secara terpusat</p>
+                <h1 className="text-4xl font-bold">📅 Data Cuti Pegawai</h1>
+                <p className="mt-2 text-lg opacity-90">Input dan pantau data cuti pegawai secara terpusat</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatsCard icon="👥" number={stats.totalPegawai} label="Total Pegawai" />
-                <StatsCard icon="📅" number={stats.cutiAktif} label="Cuti Aktif Hari Ini" />
-                <StatsCard icon="⏳" number={stats.cutiPending} label="Menunggu Persetujuan" />
-                <StatsCard icon="✅" number={stats.cutiSelesaiBulanIni} label="Cuti Selesai Bulan Ini" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <StatsCard icon="👥" number={stats.totalPegawai || '...'} label="Total Pegawai Terdaftar" />
+                <StatsCard icon="✈️" number={stats.cutiAktif} label="Sedang Cuti Hari Ini" />
+                <StatsCard icon="📋" number={stats.totalCuti} label="Total Data Cuti" />
             </div>
 
             <div className="flex bg-white rounded-xl shadow-md overflow-hidden">
@@ -205,8 +246,8 @@ const PenentuanCutiPage = () => {
             <div>
                 {activeTab === 'input' && (
                     <div className="bg-white p-8 rounded-2xl shadow-xl animate-fadeIn">
-                        <h2 className="text-2xl font-bold text-green-800 mb-6 border-b-2 pb-4 flex items-center gap-3">➕ Input Data Cuti Pegawai</h2>
-                        <CutiForm onAddCuti={handleAddCuti} />
+                        <h2 className="text-2xl font-bold text-green-800 mb-6 border-b-2 pb-4">Input Data Cuti Pegawai</h2>
+                        <CutiForm onAddCuti={handleAddCuti} pegawaiList={pegawaiList} />
                     </div>
                 )}
                 {activeTab === 'view' && (
@@ -222,14 +263,14 @@ const PenentuanCutiPage = () => {
                             />
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left text-gray-600">
+                           {loading ? <p className="text-center py-8">Memuat data...</p> : (
+                             <table className="w-full text-sm text-left text-gray-600">
                                 <thead className="text-xs text-green-800 uppercase bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3">Nama Pegawai</th>
                                         <th className="px-6 py-3">Jenis Cuti</th>
                                         <th className="px-6 py-3">Tanggal</th>
                                         <th className="px-6 py-3 text-center">Durasi</th>
-                                        <th className="px-6 py-3 text-center">Status</th>
                                         <th className="px-6 py-3 text-center">Aksi</th>
                                     </tr>
                                 </thead>
@@ -238,13 +279,8 @@ const PenentuanCutiPage = () => {
                                         <tr key={item.id} className="bg-white border-b hover:bg-gray-50">
                                             <td className="px-6 py-4 font-medium text-gray-900">{item.pegawai}</td>
                                             <td className="px-6 py-4 capitalize">{item.jenis}</td>
-                                            <td className="px-6 py-4">{item.tanggalMulai} - {item.tanggalSelesai}</td>
+                                            <td className="px-6 py-4">{new Date(item.tanggalMulai).toLocaleDateString('id-ID')} - {new Date(item.tanggalSelesai).toLocaleDateString('id-ID')}</td>
                                             <td className="px-6 py-4 text-center">{item.durasi} hari</td>
-                                            <td className="px-6 py-4 text-center">
-                                                <span className={`px-3 py-1 rounded-full font-semibold text-xs ${getStatusBadge(item.status)}`}>
-                                                    {item.status}
-                                                </span>
-                                            </td>
                                             <td className="px-6 py-4 text-center">
                                                 <button className="font-medium text-blue-600 hover:underline">Edit</button>
                                             </td>
@@ -252,13 +288,13 @@ const PenentuanCutiPage = () => {
                                     ))}
                                 </tbody>
                             </table>
+                           )}
                         </div>
                     </div>
                 )}
                 {activeTab === 'calendar' && (
-                     <div className="bg-white p-8 rounded-2xl shadow-xl text-center animate-fadeIn">
-                        <h2 className="text-2xl font-bold text-green-800 mb-6">Kalender Cuti</h2>
-                        <p className="text-gray-500">Fitur kalender akan diimplementasikan di sini.</p>
+                     <div className="bg-white p-8 rounded-2xl shadow-xl animate-fadeIn">
+                        <CutiCalendarView cutiList={cutiList} loading={loading} />
                     </div>
                 )}
             </div>

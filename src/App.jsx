@@ -9,7 +9,7 @@ import UserLayout from './layouts/UserLayout'; // <-- Import layout baru
 // Security
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
-// Pages
+// Pages admin
 import LoginPage from './pages/LoginPage';
 import DashboardAdminPage from './pages/admin/DashboardAdminPage';
 import PenentuanCutiPage from './pages/admin/PenentuanCutiPage';
@@ -18,8 +18,13 @@ import ArsipDokumenPage from './pages/admin/ArsipDokumenPage';
 import ManajemenUserPage from './pages/admin/ManajemenUserPage';
 import ManajemenAgenPage from './pages/admin/ManajemenAgenPage';
 import StrukturOrganisasiPage from './pages/admin/StrukturOrganisasiPage';
-import UserDashboard from './pages/user/UserDashboard';
+import ManajemenPegawaiPage from './pages/admin/ManajemenPegawaiPage';
 
+// Pages user
+import UserDashboard from './pages/user/UserDashboard';
+import KalenderCutiPage from './pages/user/KalenderCutiPage';
+
+// error 404
 import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
@@ -35,6 +40,7 @@ function App() {
       <Route path="/admin/agen" element={<AdminLayout><ManajemenAgenPage /></AdminLayout>} />
       <Route path="/admin/arsip" element={<AdminLayout><ArsipDokumenPage /></AdminLayout>} />
       <Route path="/admin/struktur-organisasi" element={<AdminLayout><StrukturOrganisasiPage /></AdminLayout>} />
+      <Route path="/admin/pegawai" element={<AdminLayout><ManajemenPegawaiPage /></AdminLayout>} />
       
       {/* Proteksi khusus admin */}
       <Route
@@ -55,6 +61,16 @@ function App() {
           <ProtectedRoute allowedRoles={["user"]}>
             <UserLayout>
               <UserDashboard />
+            </UserLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/kalender-cuti"
+        element={
+          <ProtectedRoute allowedRoles={["user", "admin"]}> {/* User dan Admin bisa akses */}
+            <UserLayout>
+              <KalenderCutiPage />
             </UserLayout>
           </ProtectedRoute>
         }

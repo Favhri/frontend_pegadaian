@@ -10,7 +10,8 @@ import {
   Landmark, 
   Settings, 
   LogOut,
-  Menu
+  Menu,
+  Calendar
 } from 'lucide-react';
 
 const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
@@ -29,6 +30,11 @@ const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       title: 'Dashboard',
       icon: <Home size={20} />,
       path: '/user/dashboard'
+    },
+    {
+      title: 'Kalender Cuti',
+      icon: <Calendar size={20} />,
+      path: '/user/kalender-cuti'
     },
     {
       title: 'Kalkulator Gadai',

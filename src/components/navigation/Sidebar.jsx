@@ -31,6 +31,7 @@ const menuItems = [
         icon: '👥', 
         submenu: [
             { title: 'Data Cuti', path: '/admin/penentuan-cuti' },
+            { title: 'Manajemen Pegawai', path: '/admin/pegawai' },
             { title: 'Manajemen User', path: '/admin/users', onlyAdmin: true },
             { title: 'Manajemen Agen', path: '/admin/agen' },
             { title: 'Struktur Organisasi', path: '/admin/struktur-organisasi' },

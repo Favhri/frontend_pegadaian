@@ -1,0 +1,136 @@
+/* src/pages/user/CalendarStyles.css - UNTUK REACT-CALENDAR */
+
+/* Warna dasar Pegadaian */
+:root {
+  --pegadaian-green-dark: #006400;
+  --pegadaian-green-medium: #008000;
+  --pegadaian-green-light: #4CAF50;
+  --pegadaian-border-color: #e0e0e0;
+}
+
+/* Container utama kalender */
+.react-calendar {
+  width: 100%;
+  background: white;
+  border: 1px solid var(--pegadaian-border-color);
+  border-radius: 8px;
+  font-family: inherit;
+  line-height: 1.125em;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Navigasi (Bulan/Tahun) */
+.react-calendar__navigation {
+  display: flex;
+  height: 44px;
+  margin-bottom: 1em;
+  background-color: var(--pegadaian-green-dark);
+  border-top-left-radius: 7px;
+  border-top-right-radius: 7px;
+}
+
+.react-calendar__navigation button {
+  min-width: 44px;
+  background: none;
+  border: 0;
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.react-calendar__navigation button:hover {
+  background-color: var(--pegadaian-green-medium);
+}
+
+.react-calendar__navigation button:disabled {
+  background-color: #f0f0f0;
+}
+
+/* Tampilan utama (bulan) */
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.75em;
+  color: var(--pegadaian-green-dark);
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 0.5em;
+}
+
+/* Tombol tanggal (tile) */
+.react-calendar__tile {
+  max-width: 100%;
+  padding: 10px 6.6667px;
+  background: none;
+  border: 0;
+  outline: none;
+  text-align: center;
+  font-size: 1rem;
+  height: 60px; /* Menambah tinggi cell tanggal */
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-radius: 4px;
+}
+
+.react-calendar__tile:disabled {
+  background-color: #f0f0f0;
+}
+
+/* Tanggal di luar bulan aktif */
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #b0b0b0;
+}
+
+/* Hover state untuk tanggal */
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: #e6f4ea;
+}
+
+/* Tanggal hari ini */
+.react-calendar__tile--now {
+  background: #e6ffe6; /* Hijau muda */
+  font-weight: bold;
+  color: var(--pegadaian-green-dark);
+}
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+  background: #c1e9c1;
+}
+
+/* Styling untuk tanggal cuti */
+.react-calendar__tile.cuti-day {
+  background-color: var(--pegadaian-green-light);
+  color: white;
+  position: relative;
+  overflow: visible;
+}
+
+/* Tooltip untuk menampilkan nama yang cuti */
+.cuti-day .tooltip {
+  visibility: hidden;
+  width: max-content;
+  background-color: #333;
+  color: #fff;
+  text-align: left;
+  border-radius: 6px;
+  padding: 5px 10px;
+  position: absolute;
+  z-index: 100;
+  bottom: 110%; /* Posisi tooltip di atas tanggal */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 0.75rem;
+  white-space: pre-wrap; /* Agar baris baru berfungsi */
+}
+
+.cuti-day:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}

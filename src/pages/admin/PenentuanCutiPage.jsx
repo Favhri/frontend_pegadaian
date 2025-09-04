@@ -4,9 +4,13 @@ import { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import apiClient from '../../api/axios';
+import Modal from '../../components/Modal'; // Pastikan Modal di-import
+import { Edit, Trash2 } from 'lucide-react'; // Ikon untuk tombol aksi
+import Calendar from 'react-calendar'; // Ganti ke react-calendar
+import 'react-calendar/dist/Calendar.css'; // Import CSS-nya
+import './AdminCalendarStyles.css'; // Kita akan buat file CSS custom untuk kalender admin
 
-// --- KOMPONEN-KOMPONEN KECIL (UI Elements) ---
-
+// --- KOMPONEN KECIL (UI Elements, tidak berubah) ---
 const StatsCard = ({ icon, number, label }) => (
     <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 text-center relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-green-500 to-teal-400"></div>
@@ -24,28 +28,28 @@ const TabButton = ({ icon, label, active, onClick }) => (
 );
 TabButton.propTypes = { icon: PropTypes.string, label: PropTypes.string, active: PropTypes.bool, onClick: PropTypes.func };
 
-const FormInput = ({ label, icon, children }) => (
-    <div className="mb-4">
-        <label className="flex items-center gap-2 mb-2 text-sm font-bold text-green-800">
-            {icon} {label}
-        </label>
-        {children}
-    </div>
-);
-FormInput.propTypes = { label: PropTypes.string, icon: PropTypes.string, children: PropTypes.node };
-
-// --- FORM CUTI (MENGGUNAKAN DATA MASTER PEGAWAI) ---
-const CutiForm = ({ onAddCuti, pegawaiList }) => {
+// --- FORM CUTI (SEKARANG DI DALAM MODAL UNTUK EDIT, DAN DI TAB UNTUK CREATE) ---
+const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) => {
+    const isEditMode = !!initialData;
     const [formData, setFormData] = useState({
-        pegawai: '',
-        NIK: '',
-        jenis: '',
-        tanggalMulai: '',
-        tanggalSelesai: '',
-        durasi: '',
-        alasan: '',
+        pegawai: initialData?.pegawai || '',
+        NIK: initialData?.NIK || '',
+        jenis: initialData?.jenis || '',
+        tanggalMulai: initialData?.tanggalMulai ? initialData.tanggalMulai.split('T')[0] : '',
+        tanggalSelesai: initialData?.tanggalSelesai ? initialData.tanggalSelesai.split('T')[0] : '',
+        durasi: initialData?.durasi || '',
+        alasan: initialData?.alasan || '',
         selectedPegawaiId: '',
     });
+
+    useEffect(() => {
+        if (initialData && pegawaiList.length > 0) {
+            const selectedPegawai = pegawaiList.find(p => p.NIK === initialData.NIK);
+            if (selectedPegawai) {
+                setFormData(prev => ({ ...prev, selectedPegawaiId: selectedPegawai.id.toString() }));
+            }
+        }
+    }, [initialData, pegawaiList]);
 
     useEffect(() => {
         if (formData.tanggalMulai && formData.tanggalSelesai) {
@@ -60,20 +64,16 @@ const CutiForm = ({ onAddCuti, pegawaiList }) => {
             }
         }
     }, [formData.tanggalMulai, formData.tanggalSelesai]);
-    
+
     const handlePegawaiChange = (e) => {
         const selectedId = e.target.value;
         const selectedPegawai = pegawaiList.find(p => p.id.toString() === selectedId);
-        if (selectedPegawai) {
-            setFormData(prev => ({
-                ...prev,
-                pegawai: selectedPegawai.nama_lengkap,
-                NIK: selectedPegawai.NIK,
-                selectedPegawaiId: selectedId
-            }));
-        } else {
-             setFormData(prev => ({ ...prev, pegawai: '', NIK: '', selectedPegawaiId: ''}));
-        }
+        setFormData(prev => ({
+            ...prev,
+            pegawai: selectedPegawai ? selectedPegawai.nama_lengkap : '',
+            NIK: selectedPegawai ? selectedPegawai.NIK : '',
+            selectedPegawaiId: selectedId
+        }));
     };
 
     const handleChange = (e) => {
@@ -83,19 +83,22 @@ const CutiForm = ({ onAddCuti, pegawaiList }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onAddCuti(formData);
+        onSave(formData, initialData?.id || null);
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
+            {/* ... Form fields ... */}
             <div className="grid md:grid-cols-2 gap-6">
-                <FormInput label="Nama Pegawai" icon="👤">
+                 <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nama Pegawai *</label>
                     <select name="pegawai" value={formData.selectedPegawaiId} onChange={handlePegawaiChange} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" required>
                         <option value="">Pilih dari Data Master Pegawai</option>
                         {pegawaiList.map(p => <option key={p.id} value={p.id}>{p.nama_lengkap} - NIK: {p.NIK}</option>)}
                     </select>
-                </FormInput>
-                <FormInput label="Jenis Cuti" icon="📝">
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Jenis Cuti *</label>
                     <select name="jenis" value={formData.jenis} onChange={handleChange} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" required>
                         <option value="">Pilih Jenis Cuti</option>
                         <option value="tahunan">Cuti Tahunan</option>
@@ -104,56 +107,34 @@ const CutiForm = ({ onAddCuti, pegawaiList }) => {
                         <option value="besar">Cuti Besar</option>
                         <option value="alasan-penting">Cuti Alasan Penting</option>
                     </select>
-                </FormInput>
-                <FormInput label="Tanggal Mulai Cuti" icon="📅">
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai Cuti *</label>
                     <input type="date" name="tanggalMulai" value={formData.tanggalMulai} onChange={handleChange} className="w-full p-3 border-2 border-gray-200 rounded-lg" required />
-                </FormInput>
-                <FormInput label="Tanggal Selesai Cuti" icon="📅">
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Selesai Cuti *</label>
                     <input type="date" name="tanggalSelesai" value={formData.tanggalSelesai} onChange={handleChange} className="w-full p-3 border-2 border-gray-200 rounded-lg" required />
-                </FormInput>
+                </div>
                 <div className="md:col-span-2">
-                    <FormInput label="Jumlah Hari" icon="📊">
-                        <input type="number" name="durasi" value={formData.durasi} className="w-full p-3 border-2 border-gray-200 rounded-lg bg-gray-100" readOnly placeholder="Otomatis terhitung" />
-                    </FormInput>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Jumlah Hari</label>
+                    <input type="number" name="durasi" value={formData.durasi} className="w-full p-3 border-2 border-gray-200 rounded-lg bg-gray-100" readOnly placeholder="Otomatis terhitung" />
                 </div>
             </div>
-            <FormInput label="Alasan/Keperluan Cuti" icon="📝">
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Alasan/Keperluan Cuti *</label>
                 <textarea name="alasan" value={formData.alasan} onChange={handleChange} rows="4" className="w-full p-3 border-2 border-gray-200 rounded-lg" placeholder="Jelaskan alasan atau keperluan cuti..." required></textarea>
-            </FormInput>
-            <div className="flex gap-4 pt-4">
-                <button type="submit" className="px-6 py-3 font-bold text-white bg-gradient-to-r from-green-600 to-teal-500 rounded-lg hover:opacity-90 transition">💾 Simpan Data Cuti</button>
+            </div>
+            <div className={`flex ${isEditMode ? 'justify-end' : 'justify-start'} gap-4 pt-4`}>
+                {isEditMode && <button type="button" onClick={onCancel} className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button>}
+                <button type="submit" className="px-6 py-3 font-bold text-white bg-gradient-to-r from-green-600 to-teal-500 rounded-lg hover:opacity-90 transition">
+                    {isEditMode ? 'Simpan Perubahan' : '💾 Simpan Data Cuti'}
+                </button>
             </div>
         </form>
     );
 };
-CutiForm.propTypes = { onAddCuti: PropTypes.func.isRequired, pegawaiList: PropTypes.array.isRequired };
-
-// --- KALENDER VIEW ---
-const CutiCalendarView = ({ cutiList, loading }) => {
-    const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-
-    if (loading) return <p className="text-center p-8">Memuat kalender...</p>;
-
-    return (
-        <div className="p-6">
-            <h2 className="text-2xl font-bold text-green-800 mb-6">Kalender Cuti Karyawan</h2>
-            <div className="space-y-3">
-                {cutiList.length > 0 ? cutiList.map(item => (
-                    <div key={item.id} className="bg-green-50 border-l-4 border-green-400 p-3 rounded-r-lg flex items-center justify-between flex-wrap gap-2">
-                        <div>
-                            <p className="font-bold text-green-900">{item.pegawai}</p>
-                            <p className="text-sm text-green-700 capitalize">{item.jenis}</p>
-                        </div>
-                        <p className="font-semibold text-green-800 text-sm">
-                           {formatDate(item.tanggalMulai)} - {formatDate(item.tanggalSelesai)}
-                        </p>
-                    </div>
-                )) : <p className="text-center text-gray-500 p-4">Tidak ada jadwal cuti untuk ditampilkan.</p>}
-            </div>
-        </div>
-    );
-};
-CutiCalendarView.propTypes = { cutiList: PropTypes.array.isRequired, loading: PropTypes.bool.isRequired };
+CutiForm.propTypes = { onSave: PropTypes.func.isRequired, pegawaiList: PropTypes.array.isRequired, initialData: PropTypes.object, onCancel: PropTypes.func };
 
 // --- KOMPONEN UTAMA HALAMAN ---
 const PenentuanCutiPage = () => {
@@ -162,67 +143,107 @@ const PenentuanCutiPage = () => {
     const [pegawaiList, setPegawaiList] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [currentCuti, setCurrentCuti] = useState(null);
 
-    const fetchAllCuti = async () => {
+    const fetchAllData = async () => {
         setLoading(true);
         try {
-            const response = await apiClient.get('/cuti');
-            if (response.data.success) {
-                setCutiList(response.data.data);
-            }
+            const [cutiRes, pegawaiRes] = await Promise.all([
+                apiClient.get('/cuti'),
+                apiClient.get('/pegawai')
+            ]);
+            if (cutiRes.data.success) setCutiList(cutiRes.data.data);
+            if (pegawaiRes.data.success) setPegawaiList(pegawaiRes.data.data);
         } catch (error) {
-            Swal.fire('Error', 'Gagal memuat data cuti.', 'error');
+            Swal.fire('Error', 'Gagal memuat data.', 'error');
         } finally {
             setLoading(false);
         }
     };
 
-    const fetchPegawai = async () => {
-        try {
-            const response = await apiClient.get('/pegawai');
-            if (response.data.success) {
-                setPegawaiList(response.data.data);
-            }
-        } catch (err) {
-            console.error("Gagal mengambil data pegawai:", err);
-            Swal.fire('Error', 'Gagal memuat daftar pegawai.', 'error');
-        }
-    };
-    
     useEffect(() => {
-        if (activeTab === 'input') {
-            if (pegawaiList.length === 0) fetchPegawai();
-        } else {
-            fetchAllCuti();
-        }
-    }, [activeTab]);
+        fetchAllData();
+    }, []);
 
-    const filteredData = useMemo(() => {
-        return cutiList.filter(item => 
-            item.pegawai.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [cutiList, searchTerm]);
+    const handleOpenEditModal = (cuti) => {
+        setCurrentCuti(cuti);
+        setIsModalOpen(true);
+    };
 
-    const stats = useMemo(() => {
-        const today = new Date();
-        return {
-            totalPegawai: pegawaiList.length,
-            cutiAktif: cutiList.filter(c => new Date(c.tanggalMulai) <= today && new Date(c.tanggalSelesai) >= today).length,
-            totalCuti: cutiList.length,
-        };
-    }, [cutiList, pegawaiList]);
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setCurrentCuti(null);
+    };
 
-    const handleAddCuti = async (newCutiData) => {
+    const handleSaveCuti = async (formData, cutiId) => {
+        const apiCall = cutiId
+            ? apiClient.put(`/cuti/${cutiId}`, formData)
+            : apiClient.post('/cuti', formData);
+
         try {
-            const response = await apiClient.post('/cuti', newCutiData);
+            const response = await apiCall;
             if (response.data.success) {
-                Swal.fire('Berhasil!', 'Data cuti baru telah ditambahkan.', 'success');
-                setActiveTab('view'); // Pindah ke tab view untuk melihat hasilnya
+                Swal.fire('Berhasil!', response.data.message, 'success');
+                handleCloseModal();
+                fetchAllData();
+                setActiveTab('view');
             }
         } catch (error) {
-             Swal.fire('Error', error.response?.data?.message || 'Gagal menyimpan data cuti.', 'error');
+            Swal.fire('Error', error.response?.data?.message || 'Gagal menyimpan data.', 'error');
         }
     };
+
+    const handleDeleteCuti = (cuti) => {
+        Swal.fire({
+            title: `Yakin ingin menghapus cuti ${cuti.pegawai}?`,
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await apiClient.delete(`/cuti/${cuti.id}`);
+                    Swal.fire('Terhapus!', 'Data cuti telah dihapus.', 'success');
+                    fetchAllData();
+                } catch (error) {
+                    Swal.fire('Error', error.response?.data?.message || 'Gagal menghapus data.', 'error');
+                }
+            }
+        });
+    };
+    
+    // --- Logika untuk Kalender Admin ---
+    const getTileClassName = ({ date, view }) => {
+        // (Sama seperti logika di halaman user sebelumnya)
+        if (view === 'month') {
+            for (const cuti of cutiList) {
+                const tglMulai = new Date(new Date(cuti.tanggalMulai).setHours(0, 0, 0, 0));
+                const tglSelesai = new Date(new Date(cuti.tanggalSelesai).setHours(0, 0, 0, 0));
+                const tglKalender = new Date(date.setHours(0, 0, 0, 0));
+                if (tglKalender >= tglMulai && tglKalender <= tglSelesai) {
+                    const isStart = tglKalender.getTime() === tglMulai.getTime();
+                    const isEnd = tglKalender.getTime() === tglSelesai.getTime();
+                    if (isStart && isEnd) return 'cuti-day cuti-single';
+                    if (isStart) return 'cuti-day cuti-start';
+                    if (isEnd) return 'cuti-day cuti-end';
+                    return 'cuti-day cuti-middle';
+                }
+            }
+        }
+        return null;
+    };
+    
+    const filteredData = useMemo(() => cutiList.filter(item => item.pegawai.toLowerCase().includes(searchTerm.toLowerCase())), [cutiList, searchTerm]);
+    const stats = useMemo(() => ({
+        totalPegawai: pegawaiList.length,
+        cutiAktif: cutiList.filter(c => new Date(c.tanggalMulai) <= new Date() && new Date(c.tanggalSelesai) >= new Date()).length,
+        totalCuti: cutiList.length,
+    }), [cutiList, pegawaiList]);
 
     return (
         <div className="space-y-8">
@@ -230,7 +251,6 @@ const PenentuanCutiPage = () => {
                 <h1 className="text-4xl font-bold">📅 Data Cuti Pegawai</h1>
                 <p className="mt-2 text-lg opacity-90">Input dan pantau data cuti pegawai secara terpusat</p>
             </div>
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <StatsCard icon="👥" number={stats.totalPegawai || '...'} label="Total Pegawai Terdaftar" />
                 <StatsCard icon="✈️" number={stats.cutiAktif} label="Sedang Cuti Hari Ini" />
@@ -247,7 +267,7 @@ const PenentuanCutiPage = () => {
                 {activeTab === 'input' && (
                     <div className="bg-white p-8 rounded-2xl shadow-xl animate-fadeIn">
                         <h2 className="text-2xl font-bold text-green-800 mb-6 border-b-2 pb-4">Input Data Cuti Pegawai</h2>
-                        <CutiForm onAddCuti={handleAddCuti} pegawaiList={pegawaiList} />
+                        <CutiForm onSave={handleSaveCuti} pegawaiList={pegawaiList} />
                     </div>
                 )}
                 {activeTab === 'view' && (
@@ -281,8 +301,9 @@ const PenentuanCutiPage = () => {
                                             <td className="px-6 py-4 capitalize">{item.jenis}</td>
                                             <td className="px-6 py-4">{new Date(item.tanggalMulai).toLocaleDateString('id-ID')} - {new Date(item.tanggalSelesai).toLocaleDateString('id-ID')}</td>
                                             <td className="px-6 py-4 text-center">{item.durasi} hari</td>
-                                            <td className="px-6 py-4 text-center">
-                                                <button className="font-medium text-blue-600 hover:underline">Edit</button>
+                                            <td className="px-6 py-4 text-center flex justify-center gap-4">
+                                                <button onClick={() => handleOpenEditModal(item)} className="text-blue-600 hover:text-blue-800"><Edit size={18} /></button>
+                                                <button onClick={() => handleDeleteCuti(item)} className="text-red-600 hover:text-red-800"><Trash2 size={18} /></button>
                                             </td>
                                         </tr>
                                     ))}
@@ -294,10 +315,22 @@ const PenentuanCutiPage = () => {
                 )}
                 {activeTab === 'calendar' && (
                      <div className="bg-white p-8 rounded-2xl shadow-xl animate-fadeIn">
-                        <CutiCalendarView cutiList={cutiList} loading={loading} />
+                        <h2 className="text-2xl font-bold text-green-800 mb-6 border-b-2 pb-4">Kalender Cuti</h2>
+                        {loading ? <p>Memuat kalender...</p> : <Calendar tileClassName={getTileClassName} />}
                     </div>
                 )}
             </div>
+
+            {isModalOpen && (
+                <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={'Edit Data Cuti'}>
+                    <CutiForm 
+                        onSave={handleSaveCuti}
+                        onCancel={handleCloseModal}
+                        pegawaiList={pegawaiList}
+                        initialData={currentCuti}
+                    />
+                </Modal>
+            )}
         </div>
     );
 };

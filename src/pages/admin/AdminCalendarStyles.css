@@ -1,0 +1,61 @@
+/* src/pages/admin/AdminCalendarStyles.css */
+/* Isinya sama persis dengan style kalender user */
+:root {
+  --pegadaian-green-dark: #006400;
+  --pegadaian-green-medium: #008000;
+  --pegadaian-green-light: #4CAF50;
+  --pegadaian-text-light: #ffffff;
+  --pegadaian-border-color: #e0e0e0;
+}
+.react-calendar {
+  width: 100%;
+  background: white;
+  border: 1px solid var(--pegadaian-border-color);
+  border-radius: 8px;
+}
+.react-calendar__navigation {
+  display: flex;
+  height: 50px;
+  margin-bottom: 1em;
+  background-color: var(--pegadaian-green-dark);
+}
+.react-calendar__navigation button {
+  min-width: 44px;
+  background: none;
+  border: 0;
+  color: var(--pegadaian-text-light);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.75em;
+  color: var(--pegadaian-green-dark);
+}
+.react-calendar__month-view__weekdays__weekday:last-child {
+    color: #000000;
+}
+.react-calendar__tile {
+  max-width: 100%;
+  padding: 10px 6.6667px;
+  background: none;
+  text-align: center;
+  line-height: 24px;
+  border: none;
+  border-radius: 4px;
+  height: 60px;
+}
+.react-calendar__tile--now {
+  background: #e6ffe6;
+  font-weight: bold;
+}
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #aaaaaa;
+}
+.cuti-day { background-color: var(--pegadaian-green-light); color: var(--pegadaian-text-light); }
+.cuti-start { border-top-left-radius: 20px; border-bottom-left-radius: 20px; }
+.cuti-end { border-top-right-radius: 20px; border-bottom-right-radius: 20px; }
+.cuti-single { border-radius: 20px; }
+.cuti-middle { border-radius: 0; }

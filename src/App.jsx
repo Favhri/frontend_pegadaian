@@ -23,6 +23,7 @@ import ManajemenPegawaiPage from './pages/admin/ManajemenPegawaiPage';
 // Pages user
 import UserDashboard from './pages/user/UserDashboard';
 import KalenderCutiPage from './pages/user/KalenderCutiPage';
+import ArsipDokumenUserPage from './pages/user/ArsipDokumenUserPage';
 
 // error 404
 import NotFoundPage from './pages/NotFoundPage';
@@ -71,6 +72,16 @@ function App() {
           <ProtectedRoute allowedRoles={["user", "admin"]}> {/* User dan Admin bisa akses */}
             <UserLayout>
               <KalenderCutiPage />
+            </UserLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/arsip"
+        element={
+          <ProtectedRoute allowedRoles={["user", "admin"]}>
+            <UserLayout>
+              <ArsipDokumenUserPage />
             </UserLayout>
           </ProtectedRoute>
         }

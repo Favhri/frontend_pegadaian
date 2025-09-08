@@ -11,7 +11,8 @@ import {
   Settings, 
   LogOut,
   Menu,
-  Calendar
+  Calendar,
+  Archive
 } from 'lucide-react';
 
 const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
@@ -39,23 +40,28 @@ const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
     {
       title: 'Kalkulator Gadai',
       icon: <Calculator size={20} />,
-      path: '/user/kalkulator' // Ganti path jika ada halaman khususnya
+      path: '/user/kalkulator' 
     },
     {
       title: 'Riwayat Transaksi',
       icon: <CreditCard size={20} />,
-      path: '/user/transaksi' // Ganti path jika ada halaman khususnya
+      path: '/user/transaksi' 
     },
     {
       title: 'Info Cabang',
       icon: <Landmark size={20} />,
-      path: '/user/cabang' // Ganti path jika ada halaman khususnya
+      path: '/user/cabang' 
     },
     {
       title: 'Pengaturan',
       icon: <Settings size={20} />,
-      path: '/user/settings' // Ganti path jika ada halaman khususnya
-    }
+      path: '/user/settings' 
+    },
+    {
+      title: 'Arsip Dokumen', 
+      icon: <Archive size={20} />,
+      path: '/user/arsip'
+    },
   ];
 
   return (

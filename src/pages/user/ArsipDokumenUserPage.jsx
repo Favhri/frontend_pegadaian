@@ -13,7 +13,7 @@ const ArsipDokumenUserPage = () => {
     const [filters, setFilters] = useState({ unit_kerja: 'Semua', kategori: 'Semua' });
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const unitKerjaOptions = ["Kantor Cabang", "CP TERANDAM", "UPC BANDAR BUAT", "UPC INDARUNG", "UPC MATA AIR", "UPC ALAI", "UPC SITEBA", "UPC BALAI BARU", "UPC BELIMBING", "UPC ANDURING", "UPC PARAK LAWEH"];
+    const unitKerjaOptions = ["CP TERANDAM", "UPC BANDAR BUAT", "UPC INDARUNG", "UPC MATA AIR", "UPC ALAI", "UPC SITEBA", "UPC BALAI BARU", "UPC BELIMBING", "UPC ANDURING", "UPC PARAK LAWEH"];
     const kategoriOptions = ["Keuangan", "Operasional", "Legal", "Inventory", "SDM", "Lainnya"];
 
     const fetchDokumen = async () => {
@@ -40,35 +40,32 @@ const ArsipDokumenUserPage = () => {
     };
 
     const handlePreview = (fileName) => {
-        if (!fileName) {
-            Swal.fire('Error', 'Nama file tidak valid untuk preview.', 'error');
-            return;
-        }
+        if (!fileName) return Swal.fire('Error', 'Nama file tidak valid.', 'error');
         const fileExtension = fileName.split('.').pop().toLowerCase();
-        const previewableExtensions = ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg'];
-        
-        if (previewableExtensions.includes(fileExtension)) {
+        const previewable = ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'];
+        if (previewable.includes(fileExtension)) {
             window.open(`http://localhost:5000/uploads/${fileName}`, '_blank');
         } else {
-            Swal.fire('Info', 'Tipe file ini tidak dapat di-preview. Silakan download.', 'info');
+            Swal.fire('Info', 'Tipe file ini tidak bisa di-preview, silakan download.', 'info');
+        }
+    };
+
+    const handleDownload = async (fileName) => {
+        if (!fileName) return Swal.fire('Error', 'Nama file tidak valid.', 'error');
+        try {
+            const response = await apiClient.get(`/arsip/download/${fileName}`, { responseType: 'blob' });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            Swal.fire('Error', 'Gagal mengunduh file.', 'error');
         }
     };
     
-    const handleDownload = (fileName) => {
-        if (!fileName) {
-            Swal.fire('Error', 'Nama file tidak valid untuk diunduh.', 'error');
-            return;
-        }
-        // Cara download paling simpel dan efektif
-        const downloadUrl = `http://localhost:5000/api/arsip/download/${fileName}`;
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    };
-
     const formatBytes = (bytes, decimals = 2) => {
         if (!bytes || bytes === 0) return '0 Bytes';
         const k = 1024;
@@ -80,7 +77,7 @@ const ArsipDokumenUserPage = () => {
 
     return (
         <div className="space-y-6">
-            <div className="bg-gradient-to-r from-green-600 to-green-400 text-white rounded-xl shadow-lg p-6 flex justify-between items-center">
+            <div className="bg-gradient-to-r from-green-600 to-green-400 text-white rounded-xl shadow-lg p-6">
                 <div className="flex items-center gap-4">
                     <Briefcase size={32} />
                     <div>
@@ -88,23 +85,30 @@ const ArsipDokumenUserPage = () => {
                         <p className="text-lg">Temukan dan unggah dokumen penting perusahaan di sini.</p>
                     </div>
                 </div>
-                <button onClick={() => setIsModalOpen(true)} className="bg-white/20 hover:bg-white/30 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2">
-                    <UploadCloud size={20} /> Upload
-                </button>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex flex-wrap items-center gap-4 mb-6 pb-4 border-b">
-                    <Filter size={20} className="text-gray-500" />
-                    <h3 className="font-semibold">Filter Dokumen:</h3>
-                    <select name="unit_kerja" value={filters.unit_kerja} onChange={handleFilterChange} className="p-2 border border-gray-300 rounded-md bg-white">
-                        <option value="Semua">Semua Unit</option>
-                        {unitKerjaOptions.map(unit => <option key={unit} value={unit}>{unit}</option>)}
-                    </select>
-                    <select name="kategori" value={filters.kategori} onChange={handleFilterChange} className="p-2 border border-gray-300 rounded-md bg-white">
-                        <option value="Semua">Semua Kategori</option>
-                        {kategoriOptions.map(kat => <option key={kat} value={kat}>{kat}</option>)}
-                    </select>
+                {/* ====> PERUBAHAN UTAMA DI SINI <==== */}
+                <div className="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b">
+                    {/* Bagian Kiri: Filter */}
+                    <div className="flex items-center gap-4">
+                        <Filter size={20} className="text-gray-500" />
+                        <h3 className="font-semibold">Filter Dokumen:</h3>
+                        <select name="unit_kerja" value={filters.unit_kerja} onChange={handleFilterChange} className="p-2 border border-gray-300 rounded-md bg-white">
+                            <option value="Semua">Semua Unit</option>
+                            {unitKerjaOptions.map(unit => <option key={unit} value={unit}>{unit}</option>)}
+                        </select>
+                        <select name="kategori" value={filters.kategori} onChange={handleFilterChange} className="p-2 border border-gray-300 rounded-md bg-white">
+                            <option value="Semua">Semua Kategori</option>
+                            {kategoriOptions.map(kat => <option key={kat} value={kat}>{kat}</option>)}
+                        </select>
+                    </div>
+                    {/* Bagian Kanan: Tombol Upload */}
+                    <div>
+                        <button onClick={() => setIsModalOpen(true)} className="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg flex items-center gap-2">
+                            <UploadCloud size={20} /> Upload
+                        </button>
+                    </div>
                 </div>
 
                 {loading ? <p className="text-center py-8">Memuat data...</p> : (
@@ -164,9 +168,7 @@ const UploadModal = ({ isOpen, onClose, onSuccess, unitKerjaOptions, kategoriOpt
             onClose();
         } catch (error) {
             Swal.fire('Error', error.response?.data?.message || 'Gagal mengupload dokumen.', 'error');
-        } finally {
-            setIsUploading(false);
-        }
+        } finally { setIsUploading(false); }
     };
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Upload Dokumen Baru">

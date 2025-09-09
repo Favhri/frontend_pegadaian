@@ -38,6 +38,11 @@ const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       path: '/user/kalender-cuti'
     },
     {
+      title: 'Arsip Dokumen', 
+      icon: <Archive size={20} />,
+      path: '/user/arsip'
+    },
+    {
       title: 'Kalkulator Gadai',
       icon: <Calculator size={20} />,
       path: '/user/kalkulator' 
@@ -57,11 +62,7 @@ const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       icon: <Settings size={20} />,
       path: '/user/settings' 
     },
-    {
-      title: 'Arsip Dokumen', 
-      icon: <Archive size={20} />,
-      path: '/user/arsip'
-    },
+    
   ];
 
   return (

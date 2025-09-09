@@ -19,6 +19,7 @@ import ManajemenUserPage from './pages/admin/ManajemenUserPage';
 import ManajemenAgenPage from './pages/admin/ManajemenAgenPage';
 import StrukturOrganisasiPage from './pages/admin/StrukturOrganisasiPage';
 import ManajemenPegawaiPage from './pages/admin/ManajemenPegawaiPage';
+import LaporanHarianPage from './pages/admin/LaporanHarianPage';
 
 // Pages user
 import UserDashboard from './pages/user/UserDashboard';
@@ -42,6 +43,7 @@ function App() {
       <Route path="/admin/arsip" element={<AdminLayout><ArsipDokumenPage /></AdminLayout>} />
       <Route path="/admin/struktur-organisasi" element={<AdminLayout><StrukturOrganisasiPage /></AdminLayout>} />
       <Route path="/admin/pegawai" element={<AdminLayout><ManajemenPegawaiPage /></AdminLayout>} />
+      <Route path="/admin/laporan-harian" element={<AdminLayout><LaporanHarianPage /></AdminLayout>} />
       
       {/* Proteksi khusus admin */}
       <Route

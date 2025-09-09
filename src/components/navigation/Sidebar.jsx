@@ -22,7 +22,7 @@ const menuItems = [
         title: 'Operasional', 
         icon: '📊', 
         submenu: [
-            { title: 'Input Laporan', path: '/admin/laporan' },
+            { title: 'Laporan Harian', path: '/admin/laporan-harian' },
             { title: 'Arsip Dokumen', path: '/admin/arsip' },
         ]
     },

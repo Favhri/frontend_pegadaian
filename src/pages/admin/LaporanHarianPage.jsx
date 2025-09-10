@@ -40,7 +40,7 @@ const LaporanHarianPage = () => {
                 setLaporanList(response.data.data);
             }
         } catch (error) {
-            Swal.fire('Error', 'Gagal memuat data laporan.', 'error');
+            Swal.fire('Error', 'Gagal memuat data Monev OSL.', 'error');
         } finally {
             setLoading(false);
         }
@@ -60,7 +60,7 @@ const LaporanHarianPage = () => {
         try {
             const response = await apiClient.post('/laporan', formData);
             if(response.data.success) {
-                Swal.fire('Berhasil!', 'Laporan harian berhasil disimpan.', 'success');
+                Swal.fire('Berhasil!', 'Laporan Monev OSL berhasil disimpan.', 'success');
                 setIsFormVisible(false);
                 fetchLaporan();
                 setFormData({
@@ -69,7 +69,7 @@ const LaporanHarianPage = () => {
                 });
             }
         } catch (error) {
-            Swal.fire('Error', error.response?.data?.message || 'Gagal menyimpan laporan.', 'error');
+            Swal.fire('Error', error.response?.data?.message || 'Gagal menyimpan data Monev OSL.', 'error');
         }
     };
     
@@ -91,20 +91,19 @@ const LaporanHarianPage = () => {
 
     return (
         <div className="space-y-6">
-            {/* ====> PERUBAHAN JUDUL DI SINI <==== */}
             <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-8 text-white shadow-lg">
                 <div className="flex items-center gap-4">
                     <BookText size={32} />
                     <div>
                         <h1 className="text-3xl font-bold">Monev OSL Kanwil</h1>
-                        <p>Input dan kelola laporan kinerja harian dari semua unit kerja.</p>
+                        <p>Input dan kelola data Monev OSL Kanwil dari semua unit kerja.</p>
                     </div>
                 </div>
             </div>
 
             {isFormVisible && (
                 <div className="bg-white p-6 rounded-lg shadow-md animate-fade-in-down">
-                    <h2 className="text-xl font-bold mb-4">Form Input Laporan Harian</h2>
+                    <h2 className="text-xl font-bold mb-4">Form Input Monev OSL</h2>
                     <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div><label className="block text-sm font-medium">Tanggal*</label><input type="date" name="tanggal" value={formData.tanggal} onChange={handleChange} className="w-full p-2 border rounded-md" required /></div>
                         <div><label className="block text-sm font-medium">Unit Kerja*</label><select name="unit_kerja" value={formData.unit_kerja} onChange={handleChange} className="w-full p-2 border rounded-md bg-white" required><option value="">Pilih Unit</option>{unitKerjaOptions.map(u => <option key={u} value={u}>{u}</option>)}</select></div>
@@ -124,7 +123,7 @@ const LaporanHarianPage = () => {
 
             <div className="bg-white p-6 rounded-lg shadow-md">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold">Daftar Laporan Masuk</h2>
+                    <h2 className="text-xl font-bold">Daftar Laporan Monev OSL</h2>
                     <div className='flex items-center gap-2'>
                         {!isFormVisible && <button onClick={() => setIsFormVisible(true)} className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Plus size={18}/>Input Laporan</button>}
                         <button onClick={handleExport} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Download size={18}/>Export ke Excel</button>

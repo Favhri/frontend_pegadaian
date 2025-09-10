@@ -22,7 +22,7 @@ const menuItems = [
         title: 'Operasional', 
         icon: '📊', 
         submenu: [
-            { title: 'Laporan Harian', path: '/admin/laporan-harian' },
+            { title: 'Monev OSL Kanwil', path: '/admin/laporan-harian' },
             { title: 'Arsip Dokumen', path: '/admin/arsip' },
         ]
     },
@@ -170,7 +170,7 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
     const role = getUserRole(); // ambil role user yg login
 
     return (
-        <aside className={`bg-green-700 flex flex-col transition-all duration-300 ease-in-out relative ${
+        <aside className={`bg-green-700 flex flex-col transition-all duration-300 ease-in-out ${
             isExpanded ? 'w-64' : 'w-20'
         }`}>
             {/* Header */}
@@ -184,8 +184,8 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
                 />
             </div>
             
-            {/* Navigation */}
-            <nav className="flex-1 py-4 space-y-1 overflow-y-auto pb-20">
+            {/* Navigation & Toggle Button Wrapper */}
+            <nav className="flex-1 py-4 space-y-1 overflow-y-auto">
                 {menuItems.map((item, index) => {
                     if (item.isMenuSection) {
                         return isExpanded ? (
@@ -198,9 +198,7 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
                         ) : null;
                     }
 
-                    // Cek apakah item punya submenu
                     if (item.submenu) {
-                        // filter submenu sesuai role
                         const filteredSubmenu = item.submenu.filter(sub =>
                             !(sub.onlyAdmin && role !== 'admin')
                         );
@@ -219,7 +217,6 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
                         );
                     }
 
-                    // NavLink biasa (cek kalau ada onlyAdmin)
                     if (item.onlyAdmin && role !== 'admin') return null;
 
                     return (
@@ -233,24 +230,25 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
                         />
                     );
                 })}
-            </nav>
 
-            {/* Toggle button */}
-            <div className="absolute bottom-16 left-0 right-0 p-2">
-                <div className="flex justify-center">
-                    <button 
-                        onClick={toggleSidebar} 
-                        className="w-12 h-12 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-all duration-300 transform hover:scale-110"
-                        title={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
-                    >
-                        <span className={`transform transition-transform duration-300 text-lg ${
-                            isExpanded ? 'rotate-0' : 'rotate-180'
-                        }`}>
-                            ❮
-                        </span>
-                    </button>
+                {/* Divider and Toggle button now inside the nav */}
+                <div className="px-4 pt-4 mt-2">
+                    <div className="border-t border-white/10"></div>
+                    <div className="flex justify-center mt-4">
+                        <button 
+                            onClick={toggleSidebar} 
+                            className="w-12 h-12 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-all duration-300 transform hover:scale-110"
+                            title={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
+                        >
+                            <span className={`transform transition-transform duration-300 text-lg ${
+                                isExpanded ? 'rotate-0' : 'rotate-180'
+                            }`}>
+                               ❮
+                            </span>
+                        </button>
+                    </div>
                 </div>
-            </div>
+            </nav>
         </aside>
     );
 };

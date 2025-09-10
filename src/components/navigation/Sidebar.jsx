@@ -22,6 +22,7 @@ const menuItems = [
         title: 'Operasional', 
         icon: '📊', 
         submenu: [
+            { title: 'Monev KPI Area', path: '/admin/monev-kpi' },
             { title: 'Monev OSL Kanwil', path: '/admin/laporan-harian' },
             { title: 'Arsip Dokumen', path: '/admin/arsip' },
         ]

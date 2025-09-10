@@ -20,6 +20,7 @@ import ManajemenAgenPage from './pages/admin/ManajemenAgenPage';
 import StrukturOrganisasiPage from './pages/admin/StrukturOrganisasiPage';
 import ManajemenPegawaiPage from './pages/admin/ManajemenPegawaiPage';
 import LaporanHarianPage from './pages/admin/LaporanHarianPage';
+import MonevKpiPage from './pages/admin/MonevKpiPage'; 
 
 // Pages user
 import UserDashboard from './pages/user/UserDashboard';
@@ -44,6 +45,8 @@ function App() {
       <Route path="/admin/struktur-organisasi" element={<AdminLayout><StrukturOrganisasiPage /></AdminLayout>} />
       <Route path="/admin/pegawai" element={<AdminLayout><ManajemenPegawaiPage /></AdminLayout>} />
       <Route path="/admin/laporan-harian" element={<AdminLayout><LaporanHarianPage /></AdminLayout>} />
+      <Route path="/admin/monev-kpi" element={<AdminLayout><MonevKpiPage /></AdminLayout>} />
+      
       
       {/* Proteksi khusus admin */}
       <Route

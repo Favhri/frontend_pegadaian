@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import apiClient from '../../api/axios';
-import { BarChart3, Plus, Download } from 'lucide-react'; // Import Download icon
+import { BarChart3, Plus, Download } from 'lucide-react';
 
 const MonevKpiPage = () => {
     const [kpiList, setKpiList] = useState([]);
@@ -14,7 +14,7 @@ const MonevKpiPage = () => {
         tanggal: new Date().toISOString().slice(0, 10),
         unit_kerja: '',
         nasabah_baru: '', nasabah_existing: '', nasabah_akun: '', nasabah_transaksi: '',
-        pds_umi_corner: '', g24: '', antam: '', mte: '', deposito_emas: '', // Mengubah g24_antrian menjadi g24
+        pds_umi_corner: '', g24: '', antam: '', mte: '', deposito_emas: '',
         gte_kte: '', mikro: '', disbursement: '', agen: ''
     });
 
@@ -82,7 +82,7 @@ const MonevKpiPage = () => {
 
     return (
         <div className="space-y-6">
-            <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-8 text-white shadow-lg"> {/* WARNA DISAMAKAN */}
+            <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-8 text-white shadow-lg">
                 <div className="flex items-center gap-4">
                     <BarChart3 size={32} />
                     <div>
@@ -92,28 +92,15 @@ const MonevKpiPage = () => {
                 </div>
             </div>
 
-            <div className="flex justify-end mb-4">
-                {!isFormVisible && (
-                    <button onClick={() => setIsFormVisible(true)} className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors mr-2"> {/* WARNA DISAMAKAN */}
-                        <Plus size={18}/>Input Data KPI Baru
-                    </button>
-                )}
-                <button onClick={handleExport} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
-                    <Download size={18}/>Export ke Excel
-                </button>
-            </div>
-
             {isFormVisible && (
                 <div className="bg-white p-6 rounded-lg shadow-md animate-fade-in-down">
                     <h2 className="text-xl font-bold mb-4">Form Input Monev KPI</h2>
                     <form onSubmit={handleSubmit}>
-                        {/* Baris 1: Tanggal & Unit Kerja */}
+                        {/* Form fields remain the same */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div><label className="block text-sm font-medium">Tanggal*</label><input type="date" name="tanggal" value={formData.tanggal} onChange={handleChange} className="w-full p-2 border rounded-md" required /></div>
                             <div><label className="block text-sm font-medium">Unit Kerja*</label><select name="unit_kerja" value={formData.unit_kerja} onChange={handleChange} className="w-full p-2 border rounded-md bg-white" required><option value="">Pilih Unit</option>{unitKerjaOptions.map(u => <option key={u} value={u}>{u}</option>)}</select></div>
                         </div>
-
-                        {/* Baris 2: Input KPI */}
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4 border-t pt-4">
                             <div><label className="block text-sm font-medium">Nasabah Baru</label><input type="number" name="nasabah_baru" value={formData.nasabah_baru} onChange={handleChange} placeholder="Angka" className="w-full p-2 border rounded-md" /></div>
                             <div><label className="block text-sm font-medium">Nasabah Existing</label><input type="number" name="nasabah_existing" value={formData.nasabah_existing} onChange={handleChange} placeholder="Angka" className="w-full p-2 border rounded-md" /></div>
@@ -129,11 +116,9 @@ const MonevKpiPage = () => {
                             <div><label className="block text-sm font-medium">Disbursement (Rp)</label><input type="number" name="disbursement" value={formData.disbursement} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
                             <div><label className="block text-sm font-medium">Agen (Rp)</label><input type="number" name="agen" value={formData.agen} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
                         </div>
-
-                        {/* Baris 3: Tombol Aksi */}
                         <div className="flex justify-end gap-4 border-t pt-4">
                             <button type="button" onClick={() => setIsFormVisible(false)} className="px-4 py-2 bg-gray-200 rounded-lg">Batal</button>
-                            <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg">Simpan Data</button> {/* WARNA DISAMAKAN */}
+                            <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg">Simpan Data</button>
                         </div>
                     </form>
                 </div>
@@ -141,7 +126,19 @@ const MonevKpiPage = () => {
             
             {/* Tabel Data KPI */}
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-bold mb-4">Data Monev KPI Tersimpan</h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Data Monev KPI Tersimpan</h2>
+                    <div className="flex items-center gap-2">
+                        {!isFormVisible && (
+                            <button onClick={() => setIsFormVisible(true)} className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
+                                <Plus size={18}/>Input Data
+                            </button>
+                        )}
+                        <button onClick={handleExport} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                            <Download size={18}/>Export ke Excel
+                        </button>
+                    </div>
+                </div>
                 <div className="overflow-x-auto">
                     {loading ? <p>Memuat data...</p> : (
                         <table className="w-full text-xs whitespace-nowrap">
@@ -153,7 +150,7 @@ const MonevKpiPage = () => {
                                     <th className="p-2">Existing</th>
                                     <th className="p-2">PDS Akun</th>
                                     <th className="p-2">PDS Transaksi</th>
-                                    <th className="p-2">UMI CORNER (Rp)</th>
+                                    <th className="p-2">UMI Corner (Rp)</th>
                                     <th className="p-2">G24 (gr)</th>
                                     <th className="p-2">Antam (gr)</th>
                                     <th className="p-2">MTE (gr)</th>

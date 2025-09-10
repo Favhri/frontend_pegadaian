@@ -236,7 +236,7 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
             </nav>
 
             {/* Toggle button */}
-            <div className="absolute bottom-4 left-0 right-0 p-2">
+            <div className="absolute bottom-16 left-0 right-0 p-2">
                 <div className="flex justify-center">
                     <button 
                         onClick={toggleSidebar} 

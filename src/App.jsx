@@ -26,6 +26,8 @@ import MonevKpiPage from './pages/admin/MonevKpiPage';
 import UserDashboard from './pages/user/UserDashboard';
 import KalenderCutiPage from './pages/user/KalenderCutiPage';
 import ArsipDokumenUserPage from './pages/user/ArsipDokumenUserPage';
+import UserMonevOslPage from './pages/user/UserMonevOslPage'; 
+import UserMonevKpiPage from './pages/user/UserMonevKpiPage';
 
 // error 404
 import NotFoundPage from './pages/NotFoundPage';
@@ -67,6 +69,26 @@ function App() {
           <ProtectedRoute allowedRoles={["user"]}>
             <UserLayout>
               <UserDashboard />
+            </UserLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/monev-osl"
+        element={
+          <ProtectedRoute allowedRoles={["user", "admin"]}>
+            <UserLayout>
+              <UserMonevOslPage />
+            </UserLayout>
+          </ProtectedRoute>
+        }
+      />
+       <Route
+        path="/user/monev-kpi"
+        element={
+          <ProtectedRoute allowedRoles={["user", "admin"]}>
+            <UserLayout>
+              <UserMonevKpiPage />
             </UserLayout>
           </ProtectedRoute>
         }

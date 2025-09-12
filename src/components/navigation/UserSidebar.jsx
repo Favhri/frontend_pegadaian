@@ -12,7 +12,9 @@ import {
   LogOut,
   Menu,
   Calendar,
-  Archive
+  Archive,
+  BookText,      
+  BarChart3      
 } from 'lucide-react';
 
 const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
@@ -33,6 +35,16 @@ const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       path: '/user/dashboard'
     },
     {
+        title: 'Monev OSL Kanwil',
+        icon: <BookText size={20} />,
+        path: '/user/monev-osl'
+    },
+    {
+        title: 'Monev KPI Area',
+        icon: <BarChart3 size={20} />,
+        path: '/user/monev-kpi'
+    },
+    {
       title: 'Kalender Cuti',
       icon: <Calendar size={20} />,
       path: '/user/kalender-cuti'
@@ -43,24 +55,9 @@ const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       path: '/user/arsip'
     },
     {
-      title: 'Kalkulator Gadai',
-      icon: <Calculator size={20} />,
-      path: '/user/kalkulator' 
-    },
-    {
-      title: 'Riwayat Transaksi',
-      icon: <CreditCard size={20} />,
-      path: '/user/transaksi' 
-    },
-    {
       title: 'Info Cabang',
       icon: <Landmark size={20} />,
       path: '/user/cabang' 
-    },
-    {
-      title: 'Pengaturan',
-      icon: <Settings size={20} />,
-      path: '/user/settings' 
     },
     
   ];

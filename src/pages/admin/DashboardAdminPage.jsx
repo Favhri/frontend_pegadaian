@@ -48,8 +48,8 @@ const DashboardAdminPage = () => {
   // 4. Gunakan data dari state untuk ditampilkan di kartu
   const dashboardData = [
     { icon: '👥', title: 'Total Pegawai', value: dashboardStats.totalPegawai, subtitle: 'Pegawai terdaftar' },
-    { icon: '📊', title: 'Laporan Bulan Ini', value: dashboardStats.laporanBulanIni, subtitle: 'Laporan masuk' },
-    { icon: '📅', title: 'Pengajuan Cuti', value: dashboardStats.pengajuanCuti, subtitle: 'Menunggu persetujuan' },
+    { icon: '📊', title: 'Laporan', value: dashboardStats.laporanBulanIni, subtitle: 'Laporan masuk' },
+    { icon: '📅', title: 'Jadwal Cuti', value: dashboardStats.pengajuanCuti, subtitle: 'Sedang Cuti' },
     { icon: '📁', title: 'Total Dokumen', value: dashboardStats.totalDokumen, subtitle: 'Dokumen tersimpan' },
   ];
 

@@ -4,7 +4,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
 import AdminLayout from './layouts/AdminLayout';
-import UserLayout from './layouts/UserLayout'; // <-- Import layout baru
+import UserLayout from './layouts/UserLayout'; 
+import AgenLayout from './layouts/AgenLayout';
 
 // Security
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -28,6 +29,12 @@ import KalenderCutiPage from './pages/user/KalenderCutiPage';
 import ArsipDokumenUserPage from './pages/user/ArsipDokumenUserPage';
 import UserMonevOslPage from './pages/user/UserMonevOslPage'; 
 import UserMonevKpiPage from './pages/user/UserMonevKpiPage';
+
+// Pages agen 
+import AgenDashboardPage from './pages/agen/AgenDashboardPage';
+import DaftarAgenPage from './pages/agen/DaftarAgenPage';
+import LaporanHarianAgenPage from './pages/agen/LaporanHarianAgenPage';
+import LaporanKunjunganPage from './pages/agen/LaporanKunjunganPage';
 
 // error 404
 import NotFoundPage from './pages/NotFoundPage';
@@ -112,6 +119,23 @@ function App() {
             </UserLayout>
           </ProtectedRoute>
         }
+      />
+      {/* --- GRUP RUTE UNTUK AGEN --- */}
+      <Route
+        path="/agen/dashboard"
+        element={<ProtectedRoute allowedRoles={["agen"]}><AgenLayout><AgenDashboardPage /></AgenLayout></ProtectedRoute>}
+      />
+      <Route
+        path="/agen/daftar-agen"
+        element={<ProtectedRoute allowedRoles={["agen"]}><AgenLayout><DaftarAgenPage /></AgenLayout></ProtectedRoute>}
+      />
+      <Route
+        path="/agen/laporan-harian"
+        element={<ProtectedRoute allowedRoles={["agen"]}><AgenLayout><LaporanHarianAgenPage /></AgenLayout></ProtectedRoute>}
+      />
+      <Route
+        path="/agen/laporan-kunjungan"
+        element={<ProtectedRoute allowedRoles={["agen"]}><AgenLayout><LaporanKunjunganPage /></AgenLayout></ProtectedRoute>}
       />
       {/* Tambahkan rute user lainnya di sini dengan UserLayout */}
       {/* Contoh:

@@ -84,6 +84,8 @@ const LoginPage = () => {
           navigate('/admin/dashboard');
         } else if (user.role === 'user') {
           navigate('/user/dashboard');
+        }else if (user.role === 'agen') { 
+          navigate('/agen/dashboard');
         } else {
           navigate('/login');
         }

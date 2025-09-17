@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import apiClient from '../../api/axios';
 import { BookText, Plus, Download, Edit, Trash2 } from 'lucide-react';
 import Modal from '../../components/Modal';
+import { MdCloudUpload } from "react-icons/md";
 
 // Helper untuk format mata uang
 const formatCurrency = (value) => {
@@ -182,7 +183,7 @@ const LaporanHarianPage = () => {
                     <h2 className="text-xl font-bold">Daftar Laporan Monev OSL</h2>
                     <div className='flex items-center gap-2'>
                         {userRole === 'admin' && !isFormVisible && <button onClick={() => setIsFormVisible(true)} className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Plus size={18}/>Input Laporan</button>}
-                        <button onClick={handleExport} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><Download size={18}/>Export ke Excel</button>
+                        <button onClick={handleExport} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"><MdCloudUpload size={18}/>Export ke Excel</button>
                     </div>
                 </div>
                 <div className="overflow-x-auto">

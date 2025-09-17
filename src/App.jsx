@@ -18,6 +18,8 @@ import InputLaporanPage from './pages/admin/InputLaporanPage';
 import ArsipDokumenPage from './pages/admin/ArsipDokumenPage';
 import ManajemenUserPage from './pages/admin/ManajemenUserPage';
 import ManajemenAgenPage from './pages/admin/ManajemenAgenPage';
+import LaporanHarianAgenAdminPage from './pages/admin/LaporanHarianAgenAdminPage';
+import LaporanKunjunganAgenAdminPage from './pages/admin/LaporanKunjunganAgenAdminPage';
 import StrukturOrganisasiPage from './pages/admin/StrukturOrganisasiPage';
 import ManajemenPegawaiPage from './pages/admin/ManajemenPegawaiPage';
 import LaporanHarianPage from './pages/admin/LaporanHarianPage';
@@ -50,6 +52,8 @@ function App() {
       <Route path="/admin/penentuan-cuti" element={<AdminLayout><PenentuanCutiPage /></AdminLayout>} />
       <Route path="/admin/laporan" element={<AdminLayout><InputLaporanPage /></AdminLayout>} />
       <Route path="/admin/agen" element={<AdminLayout><ManajemenAgenPage /></AdminLayout>} />
+      <Route path="/admin/laporan-harian-agen" element={<AdminLayout><LaporanHarianAgenAdminPage /></AdminLayout>} />
+      <Route path="/admin/laporan-kunjungan-agen" element={<AdminLayout><LaporanKunjunganAgenAdminPage /></AdminLayout>} />
       <Route path="/admin/arsip" element={<AdminLayout><ArsipDokumenPage /></AdminLayout>} />
       <Route path="/admin/struktur-organisasi" element={<AdminLayout><StrukturOrganisasiPage /></AdminLayout>} />
       <Route path="/admin/pegawai" element={<AdminLayout><ManajemenPegawaiPage /></AdminLayout>} />

@@ -3,10 +3,10 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import apiClient from '../../api/axios'; // <-- Import apiClient
 import { 
   LayoutDashboard,
   Users,
-  ArrowRightLeft,
   BookText,
   ClipboardCheck,
   LogOut,
@@ -17,10 +17,19 @@ const AgenSidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    navigate('/login');
+  // --- PERBAIKAN UTAMA DI SINI ---
+  const handleLogout = async () => {
+    try {
+      // 1. Beri tahu server kita mau logout
+      await apiClient.post('/auth/logout');
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // 2. Apapun yang terjadi, bersihkan data di browser dan kembali ke login
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      navigate('/login');
+    }
   };
 
   const menuItems = [

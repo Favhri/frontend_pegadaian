@@ -3,12 +3,13 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import apiClient from '../../api/axios'; // <-- Import apiClient
 import { 
   Home, 
-  Calculator, 
-  CreditCard, 
+  // Calculator, 
+  // CreditCard, 
   Landmark, 
-  Settings, 
+  // Settings, 
   LogOut,
   Menu,
   Calendar,
@@ -20,12 +21,19 @@ import {
 const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Hapus token dan data user dari localStorage
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    // Arahkan ke halaman login
-    navigate('/login');
+  // --- PERBAIKAN UTAMA DI SINI ---
+  const handleLogout = async () => {
+    try {
+      // 1. Beri tahu server kita mau logout
+      await apiClient.post('/auth/logout');
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // 2. Apapun yang terjadi, bersihkan data di browser dan kembali ke login
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+      navigate('/login');
+    }
   };
 
   const menuItems = [

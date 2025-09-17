@@ -1,4 +1,4 @@
-// favhri/frontend_pegadaian/frontend_pegadaian-c278ed7b33c7de5e22fd2c7f82ddefcb21991f55/src/pages/admin/MonevKpiPage.jsx
+// src/pages/admin/MonevKpiPage.jsx
 
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
@@ -15,6 +15,64 @@ const getUserRole = () => {
     }
 };
 
+const initialFormState = {
+    tanggal: new Date().toISOString().slice(0, 10),
+    unit_kerja: '',
+    nasabah_baru: '', nasabah_existing: '', nasabah_akun: '', nasabah_transaksi: '',
+    pds_umi_corner: '', g24: '', antam: '', mte: '', deposito_emas: '',
+    gte_kte: '', mikro: '', disbursement: '', agen: ''
+};
+
+const unitKerjaOptions = ["CP Terandam", "UPC Siteba", "UPC Belimbing", "UPC Alai", "UPC Mata Air", "UPC Parak laweh", "UPC balai baru", "UPC Simp Anduring", "UPC bandar Buat", "UPC Indarung"];
+
+// --- PERBAIKAN UTAMA DI SINI ---
+// Komponen FormFields dipindahkan ke luar dari komponen utama
+const KpiFormFields = ({ formData, handleChange }) => (
+    <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal*</label>
+                <input type="date" name="tanggal" value={formData.tanggal} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" required />
+            </div>
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Unit Kerja*</label>
+                <select name="unit_kerja" value={formData.unit_kerja} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md bg-white" required>
+                    <option value="">Pilih Unit</option>
+                    {unitKerjaOptions.map(u => <option key={u} value={u}>{u}</option>)}
+                </select>
+            </div>
+        </div>
+        <div>
+            <h4 className="font-semibold text-gray-800 mb-2 border-b pb-2">Nasabah & PDS</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                <div><label className="block text-sm font-medium">Nasabah Baru</label><input type="number" name="nasabah_baru" value={formData.nasabah_baru || ''} onChange={handleChange} placeholder="Jumlah" className="w-full p-2 border rounded-md" /></div>
+                <div><label className="block text-sm font-medium">Nasabah Existing</label><input type="number" name="nasabah_existing" value={formData.nasabah_existing || ''} onChange={handleChange} placeholder="Jumlah" className="w-full p-2 border rounded-md" /></div>
+                <div><label className="block text-sm font-medium">PDS Akun</label><input type="number" name="nasabah_akun" value={formData.nasabah_akun || ''} onChange={handleChange} placeholder="Jumlah" className="w-full p-2 border rounded-md" /></div>
+                <div><label className="block text-sm font-medium">PDS Transaksi</label><input type="number" name="nasabah_transaksi" value={formData.nasabah_transaksi || ''} onChange={handleChange} placeholder="Jumlah" className="w-full p-2 border rounded-md" /></div>
+            </div>
+        </div>
+        <div>
+            <h4 className="font-semibold text-gray-800 mb-2 border-b pb-2">Produk Emas (gram)</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                <div><label className="block text-sm font-medium">G24</label><input type="number" name="g24" value={formData.g24 || ''} onChange={handleChange} placeholder="gram" className="w-full p-2 border rounded-md" /></div>
+                <div><label className="block text-sm font-medium">Antam</label><input type="number" name="antam" value={formData.antam || ''} onChange={handleChange} placeholder="gram" className="w-full p-2 border rounded-md" /></div>
+                <div><label className="block text-sm font-medium">MTE</label><input type="number" name="mte" value={formData.mte || ''} onChange={handleChange} placeholder="gram" className="w-full p-2 border rounded-md" /></div>
+                <div><label className="block text-sm font-medium">Deposito Emas</label><input type="number" name="deposito_emas" value={formData.deposito_emas || ''} onChange={handleChange} placeholder="gram" className="w-full p-2 border rounded-md" /></div>
+            </div>
+        </div>
+        <div>
+            <h4 className="font-semibold text-gray-800 mb-2 border-b pb-2">Produk Non Gadai & Lainnya (Rp)</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
+                <div><label className="block text-sm font-medium">UMI Corner</label><input type="number" name="pds_umi_corner" value={formData.pds_umi_corner || ''} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
+                <div><label className="block text-sm font-medium">GTE & KTE</label><input type="number" name="gte_kte" value={formData.gte_kte || ''} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
+                <div><label className="block text-sm font-medium">Mikro</label><input type="number" name="mikro" value={formData.mikro || ''} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
+                <div><label className="block text-sm font-medium">Disbursement</label><input type="number" name="disbursement" value={formData.disbursement || ''} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
+                <div><label className="block text-sm font-medium">Agen</label><input type="number" name="agen" value={formData.agen || ''} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
+            </div>
+        </div>
+    </div>
+);
+
 const MonevKpiPage = () => {
     const [kpiList, setKpiList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -23,15 +81,7 @@ const MonevKpiPage = () => {
     const [currentKpi, setCurrentKpi] = useState(null);
     const userRole = getUserRole();
     
-    const [formData, setFormData] = useState({
-        tanggal: new Date().toISOString().slice(0, 10),
-        unit_kerja: '',
-        nasabah_baru: '', nasabah_existing: '', nasabah_akun: '', nasabah_transaksi: '',
-        pds_umi_corner: '', g24: '', antam: '', mte: '', deposito_emas: '',
-        gte_kte: '', mikro: '', disbursement: '', agen: ''
-    });
-
-    const unitKerjaOptions = ["CP Terandam", "UPC Siteba", "UPC Belimbing", "UPC Alai", "UPC Mata Air", "UPC Parak laweh", "UPC balai baru", "UPC Simp Anduring", "UPC bandar Buat", "UPC Indarung"];
+    const [formData, setFormData] = useState(initialFormState);
 
     const fetchKpi = async () => {
         setLoading(true);
@@ -59,8 +109,21 @@ const MonevKpiPage = () => {
     const handleOpenModal = (kpi) => {
         setCurrentKpi(kpi);
         setFormData({
-            ...kpi,
-            tanggal: new Date(kpi.tanggal).toISOString().slice(0, 10)
+            tanggal: new Date(kpi.tanggal).toISOString().slice(0, 10),
+            unit_kerja: kpi.unit_kerja,
+            nasabah_baru: kpi.nasabah_baru,
+            nasabah_existing: kpi.nasabah_existing,
+            nasabah_akun: kpi.nasabah_akun,
+            nasabah_transaksi: kpi.nasabah_transaksi,
+            pds_umi_corner: kpi.pds_umi_corner,
+            g24: kpi.g24,
+            antam: kpi.antam,
+            mte: kpi.mte,
+            deposito_emas: kpi.deposito_emas,
+            gte_kte: kpi.gte_kte,
+            mikro: kpi.mikro,
+            disbursement: kpi.disbursement,
+            agen: kpi.agen,
         });
         setIsModalOpen(true);
     };
@@ -68,6 +131,7 @@ const MonevKpiPage = () => {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setCurrentKpi(null);
+        setFormData(initialFormState);
     };
 
     const handleSubmit = async (e) => {
@@ -78,18 +142,11 @@ const MonevKpiPage = () => {
 
         try {
             const response = await apiCall;
-            if(response.data.success) {
-                Swal.fire('Berhasil!', 'Data Monev KPI berhasil disimpan.', 'success');
-                setIsFormVisible(false);
-                setIsModalOpen(false);
-                fetchKpi();
-                setFormData({
-                    tanggal: new Date().toISOString().slice(0, 10),
-                    unit_kerja: '', nasabah_baru: '', nasabah_existing: '', nasabah_akun: '', nasabah_transaksi: '',
-                    pds_umi_corner: '', g24: '', antam: '', mte: '', deposito_emas: '',
-                    gte_kte: '', mikro: '', disbursement: '', agen: ''
-                });
-            }
+            Swal.fire('Berhasil!', response.data.message, 'success');
+            setIsFormVisible(false);
+            setIsModalOpen(false);
+            setFormData(initialFormState);
+            fetchKpi();
         } catch (error) {
             Swal.fire('Error', error.response?.data?.message || 'Gagal menyimpan data.', 'error');
         }
@@ -132,62 +189,7 @@ const MonevKpiPage = () => {
             Swal.fire('Error', 'Gagal mengunduh file export.', 'error');
         }
     };
-
-    // --- PERBAIKAN UTAMA DI SINI ---
-    // Form fields component for reusability with a clean layout
-    const KpiFormFields = () => (
-        <div className="space-y-6">
-            {/* Bagian Utama */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal*</label>
-                    <input type="date" name="tanggal" value={formData.tanggal} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" required />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Unit Kerja*</label>
-                    <select name="unit_kerja" value={formData.unit_kerja} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md bg-white" required>
-                        <option value="">Pilih Unit</option>
-                        {unitKerjaOptions.map(u => <option key={u} value={u}>{u}</option>)}
-                    </select>
-                </div>
-            </div>
-
-            {/* Grup Nasabah & PDS */}
-            <div>
-                <h4 className="font-semibold text-gray-800 mb-2 border-b pb-2">Nasabah & PDS</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
-                    <div><label className="block text-sm font-medium">Nasabah Baru</label><input type="number" name="nasabah_baru" value={formData.nasabah_baru} onChange={handleChange} placeholder="Jumlah" className="w-full p-2 border rounded-md" /></div>
-                    <div><label className="block text-sm font-medium">Nasabah Existing</label><input type="number" name="nasabah_existing" value={formData.nasabah_existing} onChange={handleChange} placeholder="Jumlah" className="w-full p-2 border rounded-md" /></div>
-                    <div><label className="block text-sm font-medium">PDS Akun</label><input type="number" name="nasabah_akun" value={formData.nasabah_akun} onChange={handleChange} placeholder="Jumlah" className="w-full p-2 border rounded-md" /></div>
-                    <div><label className="block text-sm font-medium">PDS Transaksi</label><input type="number" name="nasabah_transaksi" value={formData.nasabah_transaksi} onChange={handleChange} placeholder="Jumlah" className="w-full p-2 border rounded-md" /></div>
-                </div>
-            </div>
-
-             {/* Grup Produk Emas */}
-            <div>
-                <h4 className="font-semibold text-gray-800 mb-2 border-b pb-2">Produk Emas (gram)</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
-                    <div><label className="block text-sm font-medium">G24</label><input type="number" name="g24" value={formData.g24} onChange={handleChange} placeholder="gram" className="w-full p-2 border rounded-md" /></div>
-                    <div><label className="block text-sm font-medium">Antam</label><input type="number" name="antam" value={formData.antam} onChange={handleChange} placeholder="gram" className="w-full p-2 border rounded-md" /></div>
-                    <div><label className="block text-sm font-medium">MTE</label><input type="number" name="mte" value={formData.mte} onChange={handleChange} placeholder="gram" className="w-full p-2 border rounded-md" /></div>
-                    <div><label className="block text-sm font-medium">Deposito Emas</label><input type="number" name="deposito_emas" value={formData.deposito_emas} onChange={handleChange} placeholder="gram" className="w-full p-2 border rounded-md" /></div>
-                </div>
-            </div>
-
-            {/* Grup Produk Non Gadai & Lainnya */}
-            <div>
-                <h4 className="font-semibold text-gray-800 mb-2 border-b pb-2">Produk Non Gadai & Lainnya (Rp)</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-2">
-                    <div><label className="block text-sm font-medium">UMI Corner</label><input type="number" name="pds_umi_corner" value={formData.pds_umi_corner} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
-                    <div><label className="block text-sm font-medium">GTE & KTE</label><input type="number" name="gte_kte" value={formData.gte_kte} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
-                    <div><label className="block text-sm font-medium">Mikro</label><input type="number" name="mikro" value={formData.mikro} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
-                    <div><label className="block text-sm font-medium">Disbursement</label><input type="number" name="disbursement" value={formData.disbursement} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
-                    <div><label className="block text-sm font-medium">Agen</label><input type="number" name="agen" value={formData.agen} onChange={handleChange} placeholder="Rp" className="w-full p-2 border rounded-md" /></div>
-                </div>
-            </div>
-        </div>
-    );
-
+    
     return (
         <div className="space-y-6">
             <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-8 text-white shadow-lg">
@@ -204,7 +206,7 @@ const MonevKpiPage = () => {
                 <div className="bg-white p-6 rounded-lg shadow-md animate-fade-in-down">
                     <h2 className="text-xl font-bold mb-4">Form Input Monev KPI</h2>
                     <form onSubmit={handleSubmit}>
-                        <KpiFormFields />
+                        <KpiFormFields formData={formData} handleChange={handleChange} />
                         <div className="flex justify-end gap-4 border-t pt-4 mt-4">
                             <button type="button" onClick={() => setIsFormVisible(false)} className="px-4 py-2 bg-gray-200 rounded-lg">Batal</button>
                             <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg">Simpan Data</button>
@@ -218,7 +220,7 @@ const MonevKpiPage = () => {
                     <h2 className="text-xl font-bold">Data Monev KPI Tersimpan</h2>
                     <div className="flex items-center gap-2">
                         {userRole === 'admin' && !isFormVisible && (
-                            <button onClick={() => setIsFormVisible(true)} className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
+                            <button onClick={() => { setCurrentKpi(null); setFormData(initialFormState); setIsFormVisible(true); }} className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
                                 <Plus size={18}/>Input Data
                             </button>
                         )}
@@ -270,7 +272,7 @@ const MonevKpiPage = () => {
 
              <Modal isOpen={isModalOpen} onClose={handleCloseModal} title="Edit Data Monev KPI">
                 <form onSubmit={handleSubmit}>
-                    <KpiFormFields />
+                    <KpiFormFields formData={formData} handleChange={handleChange} />
                     <div className="flex justify-end gap-4 border-t pt-4 mt-4">
                         <button type="button" onClick={handleCloseModal} className="px-4 py-2 bg-gray-200 rounded-lg">Batal</button>
                         <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded-lg">Simpan Perubahan</button>

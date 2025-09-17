@@ -3,6 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { ImHome } from "react-icons/im";
+import { BsFillFileEarmarkBarGraphFill } from "react-icons/bs";
+import { GiHumanPyramid } from "react-icons/gi";
+
 
 // Ambil role user dari localStorage (atau bisa dari context kalau lu pake)
 const getUserRole = () => {
@@ -16,11 +20,11 @@ const getUserRole = () => {
 
 const menuItems = [
     { title: 'Utama', isMenuSection: true },
-    { title: 'Dashboard', icon: '🏠', path: '/admin/dashboard' },
+    { title: 'Dashboard', icon: <ImHome />, path: '/admin/dashboard' },
     { title: 'Manajemen', isMenuSection: true },
     {
         title: 'Operasional', 
-        icon: '📊', 
+        icon: <BsFillFileEarmarkBarGraphFill />, 
         submenu: [
             { title: 'Monev KPI Area', path: '/admin/monev-kpi' },
             { title: 'Monev OSL Kanwil', path: '/admin/laporan-harian' },
@@ -29,12 +33,14 @@ const menuItems = [
     },
     {
         title: 'Sumber Daya', 
-        icon: '👥', 
+        icon: <GiHumanPyramid />, 
         submenu: [
             { title: 'Data Cuti', path: '/admin/penentuan-cuti' },
             { title: 'Manajemen Pegawai', path: '/admin/pegawai' },
             { title: 'Manajemen User', path: '/admin/users', onlyAdmin: true },
             { title: 'Manajemen Agen', path: '/admin/agen' },
+            { title: 'Laporan Harian Agen', path: '/admin/laporan-harian-agen' },
+            { title: 'Laporan Kunjungan Agen', path: '/admin/laporan-kunjungan-agen' },
             { title: 'Struktur Organisasi', path: '/admin/struktur-organisasi' },
         ]
     },

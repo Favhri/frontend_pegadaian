@@ -9,22 +9,15 @@ import { Users, Search } from 'lucide-react';
 const formatDateForDisplay = (dateString) => {
     if (!dateString) return '-';
     try {
-        // Hanya proses jika bukan string kosong atau null
         const date = new Date(dateString);
-        // Cek apakah tanggal valid
-        if (isNaN(date.getTime())) {
-            return '-';
-        }
+        if (isNaN(date.getTime())) return '-';
         return date.toLocaleDateString('id-ID', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric'
+            day: '2-digit', month: 'short', year: 'numeric'
         });
     } catch (e) {
         return '-';
     }
 };
-
 
 const DaftarAgenPage = () => {
     const [agents, setAgents] = useState([]);
@@ -58,12 +51,21 @@ const DaftarAgenPage = () => {
 
     return (
         <div className="space-y-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4 pb-4 border-b">
-                    <div className="flex items-center gap-4">
-                        <Users size={28} className="text-green-600" />
-                        <h1 className="text-2xl font-bold text-gray-800">Daftar Agen</h1>
+            {/* ===== HEADER BARU ===== */}
+            <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-8 text-white shadow-lg">
+                <div className="flex items-center gap-4">
+                    <div className="bg-white/20 p-3 rounded-lg">
+                        <Users size={32} />
                     </div>
+                    <div>
+                        <h1 className="text-3xl font-bold">Daftar Agen</h1>
+                        <p className="text-green-100">Lihat daftar lengkap agen Pegadaian yang terdaftar.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex justify-end items-center mb-4">
                     <div className="relative w-full md:w-auto">
                         <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input 
@@ -83,7 +85,6 @@ const DaftarAgenPage = () => {
                         <table className="w-full text-sm text-left whitespace-nowrap">
                             <thead className="bg-gray-50 text-gray-600 uppercase text-xs">
                                 <tr>
-                                    {/* --- HEADER BARU SESUAI PERMINTAAN --- */}
                                     <th className="p-3">No</th>
                                     <th className="p-3">Tanggal</th>
                                     <th className="p-3">Outlet</th>
@@ -102,7 +103,6 @@ const DaftarAgenPage = () => {
                             <tbody>
                                 {filteredAgents.length > 0 ? filteredAgents.map((agent, index) => (
                                     <tr key={agent.id} className="border-b hover:bg-gray-50">
-                                        {/* --- DATA BARU SESUAI HEADER --- */}
                                         <td className="p-3">{index + 1}</td>
                                         <td className="p-3">{formatDateForDisplay(agent.tanggal)}</td>
                                         <td className="p-3">{agent.outlet || '-'}</td>

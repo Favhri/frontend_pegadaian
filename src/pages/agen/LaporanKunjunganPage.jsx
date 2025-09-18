@@ -7,7 +7,7 @@ import { ClipboardCheck, Plus, Edit, Trash2, Download } from 'lucide-react';
 import Modal from '../../components/Modal';
 
 // State awal untuk form, digunakan untuk reset
-const initialFormState = {
+export const initialFormState = {
     tanggal: new Date().toISOString().slice(0, 10),
     jamKunjungan: '',
     namaAgen: '',
@@ -21,7 +21,7 @@ const initialFormState = {
 };
 
 // Komponen FormFields dipindahkan ke luar untuk mencegah bug kehilangan fokus
-const FormFields = ({ formData, handleChange }) => {
+export const FormFields = ({ formData, handleChange }) => {
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

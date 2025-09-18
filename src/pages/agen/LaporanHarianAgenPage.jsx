@@ -19,7 +19,7 @@ const formatCurrency = (value) => {
 };
 
 // State awal untuk form, digunakan untuk reset
-const initialFormState = {
+export const initialFormState = {
     tanggal: new Date().toISOString().slice(0, 10),
     hari: '',
     posisi: '',
@@ -38,7 +38,7 @@ const initialFormState = {
 };
 
 // Komponen FormFields dipindahkan ke luar untuk mencegah bug kehilangan fokus
-const FormFields = ({ formData, handleChange }) => {
+export const FormFields = ({ formData, handleChange }) => {
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-b pb-4">

@@ -1,108 +1,171 @@
 // src/pages/user/UserDashboard.jsx
 
-import React, { useState, useEffect } from 'react'; // Import useEffect
-import { DollarSign } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { NavLink } from 'react-router-dom';
+import { Bar } from 'react-chartjs-2';
+import {
+  Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
+} from 'chart.js';
+import { ArrowRight, BarChart3, BookText } from 'lucide-react';
+import apiClient from '../../api/axios';
+
+// Registrasi ChartJS
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const UserDashboard = () => {
-  const [berat, setBerat] = useState('');
-  const [kadar, setKadar] = useState('');
-  const [hasilEstimasi, setHasilEstimasi] = useState('Masukkan data untuk melihat estimasi pinjaman');
-  const [userName, setUserName] = useState('User'); // State untuk nama user
-  const [userNik, setUserNik] = useState('N/A');   // State untuk NIK user
+  const [userName, setUserName] = useState('User');
+  const [userNik, setUserNik] = useState('N/A');
+  const [oslList, setOslList] = useState([]);
+  const [kpiList, setKpiList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Ambil data user dari localStorage saat komponen dimuat
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
         setUserName(user.nama_lengkap || 'User');
-        setUserNik(user.NIK || 'N/A'); // Asumsi field NIK ada di objek user
+        setUserNik(user.NIK || 'N/A');
       } catch (error) {
-        console.error("Failed to parse user data from localStorage", error);
+        console.error("Gagal mem-parsing data user dari localStorage", error);
       }
     }
-  }, []); // [] agar hanya dijalankan sekali setelah render pertama
 
-  const hitungGadai = () => {
-    const beratNum = parseFloat(berat);
-    const kadarNum = parseFloat(kadar);
-    // Harga emas per gram bisa dibuat lebih dinamis, misal diambil dari API
-    const hargaEmasPerGram = 1050000; 
+    const fetchDashboardData = async () => {
+        setLoading(true);
+        try {
+            const [oslResponse, kpiResponse] = await Promise.all([
+                apiClient.get('/laporan'),
+                apiClient.get('/kpi')
+            ]);
+            if (oslResponse.data.success) setOslList(oslResponse.data.data);
+            if (kpiResponse.data.success) setKpiList(kpiResponse.data.data);
+        } catch (error) {
+            console.error("Gagal memuat data dashboard:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    if (beratNum > 0 && kadarNum > 0) {
-      const nilaiEmas = beratNum * (kadarNum / 24) * hargaEmasPerGram;
-      const estimasiPinjaman = nilaiEmas * 0.85; // Asumsi pinjaman 85% dari nilai taksir
-      setHasilEstimasi(`Rp ${estimasiPinjaman.toLocaleString('id-ID')}`);
-    } else {
-      setHasilEstimasi('Mohon lengkapi semua data dengan benar');
-    }
-  };
+    fetchDashboardData();
+  }, []);
+
+  // Proses data untuk grafik OSL
+  const oslChartData = useMemo(() => {
+    const dataByUnit = oslList.reduce((acc, curr) => {
+        const totalPencairan = (parseFloat(curr.pencairan_gadai) || 0) + (parseFloat(curr.pencairan_non_gadai) || 0) + (parseFloat(curr.pencairan_emas) || 0);
+        const deltaOSL = totalPencairan - (parseFloat(curr.total_pelunasan) || 0);
+        if (!acc[curr.unit_kerja]) {
+            acc[curr.unit_kerja] = { deltaOSL: 0 };
+        }
+        acc[curr.unit_kerja].deltaOSL += deltaOSL;
+        return acc;
+    }, {});
+
+    const labels = Object.keys(dataByUnit);
+    return {
+        labels,
+        datasets: [{
+            label: 'Delta OSL (Rp)',
+            data: labels.map(label => dataByUnit[label].deltaOSL),
+            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+            borderColor: 'rgba(59, 130, 246, 1)',
+            borderWidth: 1,
+            borderRadius: 5,
+        }]
+    };
+  }, [oslList]);
+
+  // Proses data untuk grafik KPI
+  const kpiChartData = useMemo(() => {
+    const dataByUnit = kpiList.reduce((acc, curr) => {
+        if (!acc[curr.unit_kerja]) {
+            acc[curr.unit_kerja] = { nasabah_baru: 0 };
+        }
+        acc[curr.unit_kerja].nasabah_baru += parseInt(curr.nasabah_baru, 10) || 0;
+        return acc;
+    }, {});
+
+    const labels = Object.keys(dataByUnit);
+    return {
+        labels,
+        datasets: [{
+            label: 'Total Nasabah Baru',
+            data: labels.map(label => dataByUnit[label].nasabah_baru),
+            backgroundColor: 'rgba(234, 179, 8, 0.7)',
+            borderColor: 'rgba(234, 179, 8, 1)',
+            borderWidth: 1,
+            borderRadius: 5,
+        }]
+    };
+  }, [kpiList]);
+
 
   return (
-    <>
-      {/* Bagian Welcoming Baru */}
-      <div className="bg-gradient-to-r from-green-600 to-green-400 text-white rounded-xl shadow-lg p-6 mb-6">
-        <h1 className="text-3xl font-bold mb-2">Halo, {userName}!</h1>
-        <p className="text-lg">Selamat datang di Dashboard Pegadaian Anda.</p>
-        <p className="text-sm mt-2">NIK : {userNik}</p>
+    <div className="space-y-6">
+      {/* Header Sambutan */}
+      <div className="bg-gradient-to-r from-green-700 to-green-500 text-white rounded-xl shadow-lg p-8">
+        <h1 className="text-3xl font-bold">Halo, {userName}!</h1>
+        <p className="mt-1 text-green-100">Selamat datang kembali di dashboard Anda.</p>
+        <p className="text-sm mt-2 font-mono">NIK: {userNik}</p>
       </div>
 
-      {/* Dashboard Stats (tetap ada di bawah welcoming) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white rounded-xl p-6 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="bg-green-100 p-3 rounded-lg">
-              <DollarSign className="text-green-700" size={24} />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Total Pinjaman Aktif</p>
-              <p className="text-xl font-bold">Rp 5.000.000</p>
-            </div>
-          </div>
-        </div>
-        {/* Tambahkan kartu statistik lainnya di sini jika perlu */}
-      </div>
+      {/* ===== PERUBAHAN UTAMA DI SINI ===== */}
+      {/* Grid untuk menampung dua chart sejajar */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {loading ? (
+            <>
+                <div className="bg-white p-6 rounded-xl shadow-md text-center col-span-1 lg:col-span-2">Memuat data grafik...</div>
+            </>
+        ) : (
+            <>
+                {/* Grafik OSL */}
+                <div className="bg-white p-6 rounded-xl shadow-md">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="bg-blue-100 p-2 rounded-full"><BookText className="text-blue-600"/></div>
+                        <h2 className="text-xl font-bold text-gray-800">Ringkasan Monev OSL Kanwil</h2>
+                    </div>
+                    <div className="h-80">
+                        <Bar data={oslChartData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: (value) => new Intl.NumberFormat('id-ID').format(value) } } } }} />
+                    </div>
+                </div>
 
-      {/* Calculator Section (tetap di bawah stats) */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <h2 className="text-xl font-bold mb-4">Kalkulator Gadai Emas</h2>
-        <div className="max-w-md">
-          <input
-            type="number"
-            value={berat}
-            onChange={(e) => setBerat(e.target.value)}
-            placeholder="Berat Emas (gram)"
-            className="w-full p-3 border rounded-lg text-gray-800 mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-          <input
-            type="number"
-            value={kadar}
-            onChange={(e) => setKadar(e.target.value)}
-            placeholder="Kadar Emas (misal: 24)"
-            className="w-full p-3 border rounded-lg text-gray-800 mb-4 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-          <button 
-            onClick={hitungGadai}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition duration-300 mb-4"
-          >
-            Hitung Estimasi
-          </button>
-          <div className="bg-green-50 p-4 rounded-lg text-center font-semibold text-green-800">
-            {hasilEstimasi}
-          </div>
-        </div>
+                {/* Grafik KPI */}
+                <div className="bg-white p-6 rounded-xl shadow-md">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="bg-yellow-100 p-2 rounded-full"><BarChart3 className="text-yellow-600"/></div>
+                        <h2 className="text-xl font-bold text-gray-800">Ringkasan Monev KPI (Nasabah Baru)</h2>
+                    </div>
+                    <div className="h-80">
+                        <Bar data={kpiChartData} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }} />
+                    </div>
+                </div>
+            </>
+        )}
       </div>
+      
+      {/* Menu Lainnya di bawah grafik */}
+      {/* <div>
+        <div className="bg-white p-6 rounded-xl shadow-md">
+           <h2 className="text-xl font-bold text-gray-800 mb-4">Menu Lainnya</h2>
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               <NavLink to="/user/monev-osl" className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+                   <span className="font-medium">Detail Monev OSL</span>
+                   <ArrowRight className="text-gray-500" />
+               </NavLink>
+               <NavLink to="/user/monev-kpi" className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+                   <span className="font-medium">Detail Monev KPI</span>
+                   <ArrowRight className="text-gray-500" />
+               </NavLink>
+               <NavLink to="/user/arsip" className="flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors">
+                   <span className="font-medium">Lihat Arsip Dokumen</span>
+                   <ArrowRight className="text-gray-500" />
+               </NavLink>
+           </div>
+         </div>
+      </div> */}
 
-      {/* Recent Transactions (tetap di bawah calculator) */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h2 className="text-xl font-bold mb-4">Transaksi Terakhir</h2>
-        <div className="overflow-x-auto">
-          <p className="text-gray-500">Tabel riwayat transaksi akan ditampilkan di sini.</p>
-          {/* Anda bisa menambahkan komponen tabel di sini */}
-        </div>
-      </div>
-    </>
+    </div>
   );
 };
 

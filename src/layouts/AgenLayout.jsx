@@ -21,7 +21,9 @@ const AgenLayout = ({ children }) => {
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
+        <aside className="sticky top-0 h-screen">
       <AgenSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      </aside>
       <div className="flex-1">
         {/* Top Navigation */}
         <header className="h-16 bg-white border-b px-6 flex items-center justify-between sticky top-0 z-40">

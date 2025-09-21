@@ -69,18 +69,6 @@ const Header = () => {
                      <p className="text-sm text-gray-700 font-semibold">Admin</p>
                      <p className="text-xs text-gray-500 truncate">admin@pegadaian.co.id</p>
                   </div>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Profil Saya
-                  </a>
-                  <a
-                    href="#"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Pengaturan
-                  </a>
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"

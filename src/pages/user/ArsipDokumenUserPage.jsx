@@ -14,7 +14,7 @@ const ArsipDokumenUserPage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const unitKerjaOptions = ["CP TERANDAM", "UPC BANDAR BUAT", "UPC INDARUNG", "UPC MATA AIR", "UPC ALAI", "UPC SITEBA", "UPC BALAI BARU", "UPC BELIMBING", "UPC ANDURING", "UPC PARAK LAWEH"];
-    const kategoriOptions = ["Keuangan", "Operasional", "Legal", "Inventory", "SDM", "Lainnya"];
+    const kategoriOptions = ["SDM","Keuangan", "Bisnis", "Resiko", "Logistik", "Surat Laporan", "Lainnya"];
 
     const fetchDokumen = async () => {
         setLoading(true);

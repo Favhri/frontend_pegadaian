@@ -62,11 +62,7 @@ const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
       icon: <Archive size={20} />,
       path: '/user/arsip'
     },
-    {
-      title: 'Info Cabang',
-      icon: <Landmark size={20} />,
-      path: '/user/cabang' 
-    },
+    
     
   ];
 

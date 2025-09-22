@@ -39,7 +39,7 @@ const Header = () => {
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <h2 className="text-2xl font-bold text-green-800">Dashboard</h2>
         <div className="flex items-center gap-4">
-          <div className="relative cursor-pointer">
+          {/* <div className="relative cursor-pointer">
             <span className="text-2xl text-gray-500 hover:text-green-600">🔔</span>
             <span className="absolute top-0 right-0 flex h-4 w-4">
               <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping"></span>
@@ -47,7 +47,7 @@ const Header = () => {
                 3
               </span>
             </span>
-          </div>
+          </div> */}
 
           {/* User Profile Dropdown */}
           <div className="relative" ref={dropdownRef}>

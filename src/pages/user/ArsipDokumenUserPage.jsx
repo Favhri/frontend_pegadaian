@@ -165,10 +165,11 @@ const ArsipDokumenUserPage = () => {
         setFilters(newFilters);
     };
 
-    const handlePreview = (fileName) => {
-        const url = `${apiClient.defaults.baseURL}/uploads/${fileName}`;
-        window.open(url, '_blank');
-    };
+   const handlePreview = (fileName) => {
+    // URL langsung ke file statis, bukan melalui /api
+    const url = `${apiClient.defaults.baseURL.replace('/api', '')}/uploads/${fileName}`;
+    window.open(url, '_blank');
+};
 
     const handleDownload = async (id, nama_dokumen) => {
         try {

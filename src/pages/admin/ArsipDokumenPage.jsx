@@ -165,9 +165,10 @@ const ArsipDokumenPage = () => {
     };
 
     const handlePreview = (fileName) => {
-      const url = `${apiClient.defaults.baseURL}/uploads/${fileName}`;
-      window.open(url, '_blank');
-    };
+    // URL langsung ke file statis, bukan melalui /api
+    const url = `${apiClient.defaults.baseURL.replace('/api', '')}/uploads/${fileName}`;
+    window.open(url, '_blank');
+};
 
     const handleDownload = async (id, nama_dokumen) => {
       try {

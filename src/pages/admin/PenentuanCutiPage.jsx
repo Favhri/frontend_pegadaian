@@ -4,13 +4,13 @@ import { useState, useMemo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import apiClient from '../../api/axios';
-import Modal from '../../components/Modal'; // Pastikan Modal di-import
-import { Edit, Trash2 } from 'lucide-react'; // Ikon untuk tombol aksi
-import Calendar from 'react-calendar'; // Ganti ke react-calendar
-import 'react-calendar/dist/Calendar.css'; // Import CSS-nya
-import './AdminCalendarStyles.css'; // Kita akan buat file CSS custom untuk kalender admin
+import Modal from '../../components/Modal';
+import { Edit, Trash2 } from 'lucide-react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import './AdminCalendarStyles.css';
 
-// --- KOMPONEN KECIL (UI Elements, tidak berubah) ---
+// Komponen-komponen UI tidak diubah, hanya dipindahkan ke sini agar rapi
 const StatsCard = ({ icon, number, label }) => (
     <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-2 transition-all duration-300 text-center relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-green-500 to-teal-400"></div>
@@ -28,7 +28,6 @@ const TabButton = ({ icon, label, active, onClick }) => (
 );
 TabButton.propTypes = { icon: PropTypes.string, label: PropTypes.string, active: PropTypes.bool, onClick: PropTypes.func };
 
-// --- FORM CUTI (SEKARANG DI DALAM MODAL UNTUK EDIT, DAN DI TAB UNTUK CREATE) ---
 const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) => {
     const isEditMode = !!initialData;
     const [formData, setFormData] = useState({
@@ -46,7 +45,8 @@ const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) 
         if (initialData && pegawaiList.length > 0) {
             const selectedPegawai = pegawaiList.find(p => p.NIK === initialData.NIK);
             if (selectedPegawai) {
-                setFormData(prev => ({ ...prev, selectedPegawaiId: selectedPegawai.id.toString() }));
+                // Menggunakan id_pegawai dari data pegawaiList
+                setFormData(prev => ({ ...prev, selectedPegawaiId: selectedPegawai.id_pegawai.toString() }));
             }
         }
     }, [initialData, pegawaiList]);
@@ -67,7 +67,7 @@ const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) 
 
     const handlePegawaiChange = (e) => {
         const selectedId = e.target.value;
-        const selectedPegawai = pegawaiList.find(p => p.id.toString() === selectedId);
+        const selectedPegawai = pegawaiList.find(p => p.id_pegawai.toString() === selectedId);
         setFormData(prev => ({
             ...prev,
             pegawai: selectedPegawai ? selectedPegawai.nama_lengkap : '',
@@ -88,13 +88,12 @@ const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) 
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            {/* ... Form fields ... */}
             <div className="grid md:grid-cols-2 gap-6">
                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nama Pegawai *</label>
                     <select name="pegawai" value={formData.selectedPegawaiId} onChange={handlePegawaiChange} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" required>
                         <option value="">Pilih dari Data Master Pegawai</option>
-                        {pegawaiList.map(p => <option key={p.id} value={p.id}>{p.nama_lengkap} - NIK: {p.NIK}</option>)}
+                        {pegawaiList.map(p => <option key={p.id_pegawai} value={p.id_pegawai}>{p.nama_lengkap} - NIK: {p.NIK}</option>)}
                     </select>
                 </div>
                 <div>
@@ -136,7 +135,6 @@ const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) 
 };
 CutiForm.propTypes = { onSave: PropTypes.func.isRequired, pegawaiList: PropTypes.array.isRequired, initialData: PropTypes.object, onCancel: PropTypes.func };
 
-// --- KOMPONEN UTAMA HALAMAN ---
 const PenentuanCutiPage = () => {
     const [activeTab, setActiveTab] = useState('input');
     const [cutiList, setCutiList] = useState([]);
@@ -149,14 +147,19 @@ const PenentuanCutiPage = () => {
     const fetchAllData = async () => {
         setLoading(true);
         try {
+            // Mengambil semua data tanpa paginasi untuk pegawai
             const [cutiRes, pegawaiRes] = await Promise.all([
                 apiClient.get('/cuti'),
-                apiClient.get('/pegawai')
+                apiClient.get('/pegawai?limit=1000') // Ambil semua pegawai untuk dropdown
             ]);
-            if (cutiRes.data.success) setCutiList(cutiRes.data.data);
-            if (pegawaiRes.data.success) setPegawaiList(pegawaiRes.data.data);
+            
+            // Pengecekan data.success sudah tidak ada lagi di API-mu
+            setCutiList(cutiRes.data.data);
+            setPegawaiList(pegawaiRes.data.data);
+
         } catch (error) {
             Swal.fire('Error', 'Gagal memuat data.', 'error');
+            console.error(error);
         } finally {
             setLoading(false);
         }
@@ -183,12 +186,11 @@ const PenentuanCutiPage = () => {
 
         try {
             const response = await apiCall;
-            if (response.data.success) {
-                Swal.fire('Berhasil!', response.data.message, 'success');
-                handleCloseModal();
-                fetchAllData();
-                setActiveTab('view');
-            }
+            // Pengecekan data.success sudah tidak ada lagi
+            Swal.fire('Berhasil!', response.data.message, 'success');
+            handleCloseModal();
+            fetchAllData();
+            setActiveTab('view');
         } catch (error) {
             Swal.fire('Error', error.response?.data?.message || 'Gagal menyimpan data.', 'error');
         }
@@ -217,14 +219,18 @@ const PenentuanCutiPage = () => {
         });
     };
     
-    // --- Logika untuk Kalender Admin ---
     const getTileClassName = ({ date, view }) => {
-        // (Sama seperti logika di halaman user sebelumnya)
         if (view === 'month') {
             for (const cuti of cutiList) {
-                const tglMulai = new Date(new Date(cuti.tanggalMulai).setHours(0, 0, 0, 0));
-                const tglSelesai = new Date(new Date(cuti.tanggalSelesai).setHours(0, 0, 0, 0));
+                // Pastikan tanggal valid sebelum diproses
+                const tglMulai = new Date(cuti.tanggalMulai);
+                const tglSelesai = new Date(cuti.tanggalSelesai);
+                if (isNaN(tglMulai.getTime()) || isNaN(tglSelesai.getTime())) continue;
+
+                tglMulai.setHours(0, 0, 0, 0);
+                tglSelesai.setHours(0, 0, 0, 0);
                 const tglKalender = new Date(date.setHours(0, 0, 0, 0));
+
                 if (tglKalender >= tglMulai && tglKalender <= tglSelesai) {
                     const isStart = tglKalender.getTime() === tglMulai.getTime();
                     const isEnd = tglKalender.getTime() === tglSelesai.getTime();
@@ -238,7 +244,11 @@ const PenentuanCutiPage = () => {
         return null;
     };
     
-    const filteredData = useMemo(() => cutiList.filter(item => item.pegawai.toLowerCase().includes(searchTerm.toLowerCase())), [cutiList, searchTerm]);
+    const filteredData = useMemo(() => 
+        cutiList.filter(item => 
+            (item.pegawai || '').toLowerCase().includes(searchTerm.toLowerCase())
+        ), [cutiList, searchTerm]);
+
     const stats = useMemo(() => ({
         totalPegawai: pegawaiList.length,
         cutiAktif: cutiList.filter(c => new Date(c.tanggalMulai) <= new Date() && new Date(c.tanggalSelesai) >= new Date()).length,
@@ -252,9 +262,9 @@ const PenentuanCutiPage = () => {
                 <p className="mt-2 text-lg opacity-90">Input dan pantau data cuti pegawai secara terpusat</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <StatsCard icon="👥" number={stats.totalPegawai || '...'} label="Total Pegawai Terdaftar" />
-                <StatsCard icon="✈️" number={stats.cutiAktif} label="Sedang Cuti Hari Ini" />
-                <StatsCard icon="📋" number={stats.totalCuti} label="Total Data Cuti" />
+                <StatsCard icon="👥" number={loading ? '...' : stats.totalPegawai} label="Total Pegawai Terdaftar" />
+                <StatsCard icon="✈️" number={loading ? '...' : stats.cutiAktif} label="Sedang Cuti Hari Ini" />
+                <StatsCard icon="📋" number={loading ? '...' : stats.totalCuti} label="Total Data Cuti" />
             </div>
 
             <div className="flex bg-white rounded-xl shadow-md overflow-hidden">
@@ -267,7 +277,7 @@ const PenentuanCutiPage = () => {
                 {activeTab === 'input' && (
                     <div className="bg-white p-8 rounded-2xl shadow-xl animate-fadeIn">
                         <h2 className="text-2xl font-bold text-green-800 mb-6 border-b-2 pb-4">Input Data Cuti Pegawai</h2>
-                        <CutiForm onSave={handleSaveCuti} pegawaiList={pegawaiList} />
+                        {loading ? <p>Memuat data pegawai...</p> : <CutiForm onSave={handleSaveCuti} pegawaiList={pegawaiList} />}
                     </div>
                 )}
                 {activeTab === 'view' && (

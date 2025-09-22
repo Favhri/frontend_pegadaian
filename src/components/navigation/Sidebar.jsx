@@ -185,7 +185,7 @@ const Sidebar = ({ isExpanded, toggleSidebar, onAccordionClick }) => {
                 isExpanded ? 'justify-start' : 'justify-center'
             }`}>
                 <img 
-                    src={isExpanded ? "/src/assets/logo-pegadaian-white.svg" : "../src/assets/Terndam.png"}
+                    src={isExpanded ? "/assets/logo-pegadaian-white.svg" : "/assets/terndam.png"}
                     alt="logo" 
                     className={`transition-all duration-300 ${isExpanded ? 'h-10' : 'h-8'}`} 
                 />

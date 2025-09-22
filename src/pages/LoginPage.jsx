@@ -112,7 +112,7 @@ const LoginPage = () => {
       <div className="w-full max-w-5xl grid md:grid-cols-2 bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="hidden md:flex flex-col justify-center p-12 bg-gradient-to-br from-green-700 to-green-600 text-white text-center">
           <div className="flex justify-center items-center gap-4 mb-4">
-              <img src="/src/assets/terndam.png" alt="logo" style={{ width: '200px', height: 'auto', margin: '0 auto' }} />
+              <img src="/assets/terndam.png" alt="logo" style={{ width: '200px', height: 'auto', margin: '0 auto' }} />
           </div>
           <p className="text-xl mb-6">
             Solusi Finansial Terpercaya<br />

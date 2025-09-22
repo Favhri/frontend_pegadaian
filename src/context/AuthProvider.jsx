@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
       const idleTime = now - lastActivity;
 
       // Misal idle lebih dari 10 menit → paksa logout
-      if (idleTime > 10 * 60 * 1000) {
+      if (idleTime > 60 * 60 * 1000) {
         localStorage.removeItem("authToken");
         localStorage.removeItem("user");
         setToken(null);

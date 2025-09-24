@@ -123,7 +123,7 @@ const UserMonevKpiPage = () => {
             )}
             
             <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex justify-between items-center mb-4">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4">
                     <h2 className="text-xl font-bold">Data Monev KPI Tersimpan</h2>
                     <div className="flex items-center gap-2">
                         {!isFormVisible && (
@@ -136,9 +136,9 @@ const UserMonevKpiPage = () => {
                         </button>
                     </div>
                 </div>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto relative shadow-md sm:rounded-lg">
                     {loading ? <p>Memuat data...</p> : (
-                        <table className="w-full text-xs whitespace-nowrap">
+                        <table className="w-full text-sm text-left text-gray-500">
                            <thead className="text-left bg-gray-50 uppercase">
                                 <tr>
                                     <th className="p-2 sticky left-0 bg-gray-50">Unit Kerja</th>

@@ -44,6 +44,10 @@ const UserLayout = ({ children }) => {
             </div>
           </div>
         </header>
+{/* Tambahkan margin kiri di layar besar untuk memberi ruang bagi sidebar */}
+      <div className="lg:ml-[280px]">
+        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        </div>
 
 {/* Overlay untuk mobile */}
     {sidebarOpen && (

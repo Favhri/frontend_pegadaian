@@ -44,6 +44,10 @@ const AgenLayout = ({ children }) => {
           </div>
         </header>
 
+        <div className="lg:ml-[280px]">
+        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        </div>
+
         {/* Overlay untuk mobile */}
     {sidebarOpen && (
       <div 

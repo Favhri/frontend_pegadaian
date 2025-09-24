@@ -21,24 +21,27 @@ const UserLayout = ({ children }) => {
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
-      <aside className="top-0 h-screen">
       <UserSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      </aside>
       <div className="flex-1">
-        
-{/* Tambahkan margin kiri di layar besar untuk memberi ruang bagi sidebar */}
-      <div className="lg:ml-[280px]">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        </div>
-
-{/* Overlay untuk mobile */}
-    {sidebarOpen && (
-      <div 
-        className="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"
-        onClick={() => setSidebarOpen(false)}
-      ></div>
-    )}
-    
+        {/* Top Navigation */}
+        <header className="h-16 bg-white border-b px-6 flex items-center justify-between sticky top-0 z-40">
+          <button 
+            className="lg:hidden"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <Menu size={24} />
+          </button>
+          
+          <div className="flex items-center gap-4">
+            {/* Profile section */}
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                <span className="text-green-700 font-medium">{userName.charAt(0)}</span>
+              </div>
+              <span className="text-sm font-medium">{userName}</span>
+            </div>
+          </div>
+        </header>
 
         {/* Page Content */}
         <main className="p-6">

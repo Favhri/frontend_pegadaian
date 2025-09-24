@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import apiClient from '../../api/axios';
-import { Plus, Edit, Trash2, Download } from 'lucide-react';
+import { ClipboardCheck, Plus, Edit, Trash2, Download } from 'lucide-react';
 import Modal from '../../components/Modal';
 
 // State awal untuk form, digunakan untuk reset
@@ -158,6 +158,20 @@ const LaporanKunjunganPage = () => {
     
     return (
         <div className="space-y-6">
+            <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-8 text-white shadow-lg">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="bg-white/20 p-3 rounded-lg">
+                            <ClipboardCheck size={32} />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold">Laporan Kunjungan Agen</h1>
+                            <p className="text-green-100">Catat dan kelola laporan kunjungan ke agen di sini.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {isFormVisible && (
                 <div className="bg-white p-6 rounded-lg shadow-md animate-fade-in-down">
                     <h2 className="text-xl font-bold mb-4">Form Input Laporan Kunjungan</h2>
@@ -181,7 +195,7 @@ const LaporanKunjunganPage = () => {
                 </form>
             </Modal>
 
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white p-6 rounded-lg shadow-md mt-6">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
                     <h2 className="text-xl font-bold text-gray-800">Data Laporan Kunjungan</h2>
                     <div className="flex gap-2 mt-3 sm:mt-0">

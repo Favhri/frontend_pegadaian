@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import apiClient from '../../api/axios';
-import { BookText, Plus, Edit, Trash2, Download } from 'lucide-react';
+import { Plus, Edit, Trash2, Download } from 'lucide-react';
 import Modal from '../../components/Modal';
 
 // Helper untuk format mata uang
@@ -210,20 +210,6 @@ const LaporanHarianAgenPage = () => {
 
     return (
         <div className="space-y-6">
-            <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-8 text-white shadow-lg">
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="bg-white/20 p-3 rounded-lg">
-                            <BookText size={32} />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl font-bold">Laporan Posisi Harian Agen</h1>
-                            <p className="text-green-100">Catat dan kelola laporan harian agen di sini.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {isFormVisible && (
                 <div className="bg-white p-6 rounded-lg shadow-md animate-fade-in-down">
                     <h2 className="text-xl font-bold mb-4">Form Input Laporan</h2>

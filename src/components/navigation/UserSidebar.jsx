@@ -68,7 +68,7 @@ const UserSidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
   return (
     <aside 
-      className={`bg-white h-screen fixed lg:static w-[280px] transition-all duration-300 ease-in-out z-50
+      className={`bg-white h-screen fixed w-[280px] transition-all duration-300 ease-in-out z-50
         ${sidebarOpen ? 'left-0' : '-left-[280px] lg:left-0'}`}
     >
       <div className="flex flex-col h-full">

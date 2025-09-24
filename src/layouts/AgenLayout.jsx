@@ -21,7 +21,7 @@ const AgenLayout = ({ children }) => {
 
   return (
     <div className="flex bg-gray-50 min-h-screen">
-        <aside className="sticky top-0 h-screen">
+        <aside className="top-0 h-screen">
       <AgenSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </aside>
       <div className="flex-1">
@@ -43,6 +43,14 @@ const AgenLayout = ({ children }) => {
             </div>
           </div>
         </header>
+
+        {/* Overlay untuk mobile */}
+    {sidebarOpen && (
+      <div 
+        className="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"
+        onClick={() => setSidebarOpen(false)}
+      ></div>
+    )}
 
         {/* Page Content */}
         <main className="p-6">

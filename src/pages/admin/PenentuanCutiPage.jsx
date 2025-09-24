@@ -50,7 +50,7 @@ const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) 
             }
         }
     }, [initialData, pegawaiList]);
-
+// 
     useEffect(() => {
         if (formData.tanggalMulai && formData.tanggalSelesai) {
             const start = new Date(formData.tanggalMulai);
@@ -66,15 +66,16 @@ const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) 
     }, [formData.tanggalMulai, formData.tanggalSelesai]);
 
     const handlePegawaiChange = (e) => {
-        const selectedId = e.target.value;
-        const selectedPegawai = pegawaiList.find(p => p.id_pegawai.toString() === selectedId);
-        setFormData(prev => ({
-            ...prev,
-            pegawai: selectedPegawai ? selectedPegawai.nama_lengkap : '',
-            NIK: selectedPegawai ? selectedPegawai.NIK : '',
-            selectedPegawaiId: selectedId
-        }));
-    };
+    const selectedId = e.target.value;
+    // Menambahkan pengecekan `p && p.id_pegawai` untuk keamanan
+    const selectedPegawai = pegawaiList.find(p => p && p.id_pegawai && p.id_pegawai.toString() === selectedId);
+    setFormData(prev => ({
+        ...prev,
+        pegawai: selectedPegawai ? selectedPegawai.nama_lengkap : '',
+        NIK: selectedPegawai ? selectedPegawai.NIK : '',
+        selectedPegawaiId: selectedId
+    }));
+};
 
     const handleChange = (e) => {
         const { name, value } = e.target;

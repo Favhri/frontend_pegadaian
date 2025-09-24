@@ -25,25 +25,6 @@ const AgenLayout = ({ children }) => {
       <AgenSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </aside>
       <div className="flex-1">
-        {/* Top Navigation */}
-        <header className="h-16 bg-white border-b px-6 flex items-center justify-between sticky top-0 z-40">
-          <button 
-            className="lg:hidden"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu size={24} />
-          </button>
-          
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                <span className="text-green-700 font-medium">{userName.charAt(0)}</span>
-              </div>
-              <span className="text-sm font-medium">{userName}</span>
-            </div>
-          </div>
-        </header>
-
         <div className="lg:ml-[280px]">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         </div>

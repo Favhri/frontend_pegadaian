@@ -20,7 +20,7 @@ export const initialFormState = {
     lainnya: '',
 };
 
-// Komponen FormFields dipindahkan ke luar untuk mencegah bug kehilangan fokus
+// Komponen FormFields
 export const FormFields = ({ formData, handleChange }) => {
     return (
         <div className="space-y-4">
@@ -158,21 +158,16 @@ const LaporanKunjunganPage = () => {
     
     return (
         <div className="space-y-6">
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                 <div className="flex justify-between items-center mb-4">
+            <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-8 text-white shadow-lg">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                     <div className="flex items-center gap-4">
-                        <ClipboardCheck size={28} className="text-green-600" />
-                        <h1 className="text-2xl font-bold text-gray-800">Laporan Kunjungan Agen</h1>
-                    </div>
-                     <div className="flex gap-2">
-                        {!isFormVisible && (
-                            <button onClick={() => { setCurrentLaporan(null); setFormData(initialFormState); setIsFormVisible(true); }} className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700">
-                                <Plus size={18}/> Input Laporan
-                            </button>
-                        )}
-                        <button onClick={handleExport} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700">
-                            <Download size={18}/> Export
-                        </button>
+                        <div className="bg-white/20 p-3 rounded-lg">
+                            <ClipboardCheck size={32} />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold">Laporan Kunjungan Agen</h1>
+                            <p className="text-green-100">Catat dan kelola laporan kunjungan ke agen di sini.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -201,7 +196,25 @@ const LaporanKunjunganPage = () => {
             </Modal>
 
             <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-                <h2 className="text-xl font-bold mb-4">Data Laporan Kunjungan</h2>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4">
+                    <h2 className="text-xl font-bold text-gray-800">Data Laporan Kunjungan</h2>
+                    <div className="flex gap-2 mt-3 sm:mt-0">
+                        {!isFormVisible && (
+                            <button 
+                                onClick={() => { setCurrentLaporan(null); setFormData(initialFormState); setIsFormVisible(true); }} 
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700"
+                            >
+                                <Plus size={18}/> Input Laporan
+                            </button>
+                        )}
+                        <button 
+                            onClick={handleExport} 
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+                        >
+                            <Download size={18}/> Export
+                        </button>
+                    </div>
+                </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left whitespace-nowrap">
                         <thead className="bg-gray-50 text-gray-600 uppercase text-xs">

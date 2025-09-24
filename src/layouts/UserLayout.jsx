@@ -24,7 +24,11 @@ const UserLayout = ({ children }) => {
       <aside className="top-0 h-screen">
       <UserSidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </aside>
-      <div className="flex-1">
+      <div 
+  className={`flex-1 transition-all duration-300 ease-in-out ${
+    sidebarOpen ? 'lg:ml-[280px]' : 'lg:ml-0'
+  }`}
+>
         {/* Top Navigation */}
         <header className="h-16 bg-white border-b px-6 flex items-center justify-between sticky top-0 z-40">
           <button 
@@ -45,15 +49,13 @@ const UserLayout = ({ children }) => {
           </div>
         </header>
 
-
-{/* Overlay untuk mobile */}
-    {sidebarOpen && (
-      <div 
-        className="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"
-        onClick={() => setSidebarOpen(false)}
-      ></div>
-    )}
     
+{sidebarOpen && (
+  <div 
+    className="fixed inset-0 bg-black opacity-50 z-40 lg:hidden"
+    onClick={() => setSidebarOpen(false)}
+  ></div>
+)}
 
         {/* Page Content */}
         <main className="p-6">

@@ -89,7 +89,7 @@ const ManajemenPegawaiPage = () => {
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
-        setCurrentPegawai(null);
+        
     };
 
     const handleSubmit = async (e) => {

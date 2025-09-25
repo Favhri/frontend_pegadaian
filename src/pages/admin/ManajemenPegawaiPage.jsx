@@ -221,7 +221,7 @@ const ManajemenPegawaiPage = () => {
                 </div>
             </div>
 
-            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={isEditMode ? 'Edit Data Pegawai' : 'Tambah Pegawai Baru'}>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={formData.id_pegawai ? 'Edit Data Pegawai' : 'Tambah Pegawai Baru'}>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Nama Lengkap</label>

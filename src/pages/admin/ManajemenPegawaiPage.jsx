@@ -63,36 +63,15 @@ const ManajemenPegawaiPage = () => {
         });
     };
 
-    // FUNGSI UNTUK MENANGANI KLIK EDIT
-    const handleEdit = (pegawaiData) => {
-        // Log ini akan menampilkan seluruh data dari baris yang tombol editnya diklik
-        console.log("Data Pegawai yang di-klik Edit:", pegawaiData);
-
-        setIsEditMode(true);
-        setCurrentPegawai(pegawaiData);
-        setFormData({
-            nama_lengkap: pegawaiData.nama_lengkap,
-            NIK: pegawaiData.NIK,
-            jabatan: pegawaiData.jabatan,
-            unit_kerja: pegawaiData.unit_kerja,
-        });
-        handleShowModal();
-    };
-
-    // FUNGSI UNTUK SUBMIT DATA (CREATE & UPDATE)
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // Log ini akan menampilkan state pegawai saat ini sebelum data dikirim
-        console.log("Submitting with currentPegawai:", currentPegawai);
-
         try {
             if (isEditMode) {
-                // Pengecekan krusial: pastikan id_pegawai ada sebelum mengirim
+                // PENGECEKAN & DEBUGGING: Pastikan currentPegawai dan id_pegawai ada
+                console.log("Data yang akan di-UPDATE:", currentPegawai);
                 if (!currentPegawai || !currentPegawai.id_pegawai) {
-                    console.error("GAGAL EDIT: id_pegawai tidak ada atau undefined!", currentPegawai);
-                    Swal.fire('Error', 'ID Pegawai tidak ditemukan saat akan mengupdate.', 'error');
-                    return; // Hentikan eksekusi jika ID tidak ada
+                    Swal.fire('Error', 'Gagal mengedit data: ID Pegawai tidak ditemukan.', 'error');
+                    return;
                 }
                 await apiClient.put(`/pegawai/${currentPegawai.id_pegawai}`, formData);
                 Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
@@ -108,11 +87,9 @@ const ManajemenPegawaiPage = () => {
         }
     };
 
-    // FUNGSI UNTUK MENGHAPUS DATA
     const handleDelete = (id) => {
-        // Log ini akan menampilkan ID yang akan dihapus
-        console.log("ID untuk dihapus:", id);
-
+        // DEBUGGING: Cek ID yang akan dihapus
+        console.log("ID yang akan di-DELETE:", id);
         Swal.fire({
             title: 'Anda yakin?',
             text: "Data yang dihapus tidak dapat dikembalikan!",
@@ -125,17 +102,15 @@ const ManajemenPegawaiPage = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    // Pengecekan krusial: pastikan ID ada sebelum menghapus
+                    // PENGECEKAN: Pastikan ID tidak null/undefined sebelum request
                     if (!id) {
-                        console.error("GAGAL HAPUS: ID yang dikirim undefined.");
-                        Swal.fire('Error', 'ID Pegawai tidak ditemukan saat akan menghapus.', 'error');
-                        return; // Hentikan eksekusi jika ID tidak ada
+                         Swal.fire('Error', 'Gagal menghapus data: ID Pegawai tidak ditemukan.', 'error');
+                         return;
                     }
                     await apiClient.delete(`/pegawai/${id}`);
                     Swal.fire('Dihapus!', 'Data pegawai telah dihapus.', 'success');
                     fetchPegawai(pagination.currentPage);
                 } catch (error) {
-                    console.error('Error deleting data:', error);
                     Swal.fire('Error', 'Gagal menghapus data.', 'error');
                 }
             }
@@ -147,7 +122,9 @@ const ManajemenPegawaiPage = () => {
     };
 
     const handlePageChange = (newPage) => {
-        setPagination(prev => ({ ...prev, currentPage: newPage }));
+        if (newPage > 0 && newPage <= pagination.totalPages) {
+            setPagination(prev => ({ ...prev, currentPage: newPage }));
+        }
     };
 
     return (
@@ -195,7 +172,19 @@ const ManajemenPegawaiPage = () => {
                                 <td className="py-2 px-4 border-b">{item.unit_kerja}</td>
                                 <td className="py-2 px-4 border-b text-center">
                                     <button
-                                        onClick={() => handleEdit(item)}
+                                        onClick={() => {
+                                            // DEBUGGING: Cek data 'item' saat tombol edit diklik
+                                            console.log("Data Pegawai yang di-klik Edit:", item);
+                                            setIsEditMode(true);
+                                            setCurrentPegawai(item);
+                                            setFormData({
+                                                nama_lengkap: item.nama_lengkap,
+                                                NIK: item.NIK,
+                                                jabatan: item.jabatan,
+                                                unit_kerja: item.unit_kerja,
+                                            });
+                                            handleShowModal();
+                                        }}
                                         className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mr-2"
                                     >
                                         Edit
@@ -230,7 +219,6 @@ const ManajemenPegawaiPage = () => {
 
             <Modal show={showModal} onClose={handleCloseModal} title={isEditMode ? 'Edit Pegawai' : 'Tambah Pegawai'}>
                 <form onSubmit={handleSubmit}>
-                    {/* ... form fields ... */}
                     <div className="mb-4">
                         <label className="block text-gray-700">Nama Lengkap</label>
                         <input type="text" name="nama_lengkap" value={formData.nama_lengkap} onChange={handleInputChange} className="w-full p-2 border rounded" required />

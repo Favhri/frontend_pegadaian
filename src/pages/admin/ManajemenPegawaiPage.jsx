@@ -1,251 +1,255 @@
 import React, { useState, useEffect } from 'react';
-import Swal from 'sweetalert2';
 import apiClient from '../../api/axios';
-import { Users, PlusCircle, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import Swal from 'sweetalert2';
 import Modal from '../../components/Modal';
 
-// Komponen Header dikembalikan sesuai permintaan gambar
-const PageHeader = ({ title, subtitle, icon }) => (
-    <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-6 text-white shadow-lg">
-        <div className="flex items-center gap-4">
-            <div className="bg-white/20 p-3 rounded-lg">
-                {icon}
-            </div>
-            <div>
-                <h1 className="text-2xl font-bold">{title}</h1>
-                <p className="text-green-100">{subtitle}</p>
-            </div>
-        </div>
-    </div>
-);
-
-
 const ManajemenPegawaiPage = () => {
-    const [pegawaiList, setPegawaiList] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [pegawai, setPegawai] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [formData, setFormData] = useState({
+        nama_lengkap: '',
+        NIK: '',
+        jabatan: '',
+        unit_kerja: '',
+    });
     const [isEditMode, setIsEditMode] = useState(false);
     const [currentPegawai, setCurrentPegawai] = useState(null);
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 1,
-        totalPegawai: 0
+        totalItems: 0,
     });
-    
-    const [formData, setFormData] = useState({
-        nama_lengkap: '',
-        NIK: '',
-        jabatan: '',
-        unit_kerja: ''
-    });
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const unitKerjaOptions = [
-        "CP TERANDAM", "UPC BANDAR BUAT", "UPC INDARUNG", "UPC MATA AIR", "UPC ALAI",
-        "UPC SITEBA", "UPC BALAI BARU", "UPC BELIMBING", "UPC ANDURING", "UPC PARAK LAWEH"
-    ];
-
-    const fetchPegawai = async (page = 1) => {
-        setLoading(true);
+    const fetchPegawai = async (page = 1, search = '') => {
         try {
             const response = await apiClient.get('/pegawai', {
-                params: { page, limit: 10 }
+                params: {
+                    page,
+                    limit: 10,
+                    search,
+                },
             });
-            if (response.data.success) {
-                setPegawaiList(response.data.data);
-                setPagination(response.data.pagination);
-            }
+            setPegawai(response.data.data);
+            setPagination({
+                currentPage: response.data.currentPage,
+                totalPages: response.data.totalPages,
+                totalItems: response.data.totalItems,
+            });
         } catch (error) {
             console.error('Error fetching pegawai:', error);
-            Swal.fire('Error', 'Gagal memuat data master pegawai.', 'error');
-        } finally {
-            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchPegawai(pagination.currentPage);
-    }, [pagination.currentPage]);
+        fetchPegawai(pagination.currentPage, searchTerm);
+    }, [pagination.currentPage, searchTerm]);
 
-    const handleChange = (e) => {
+    const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData({ ...formData, [name]: value });
     };
 
-    const handleOpenModal = (pegawai = null) => {
-        if (pegawai) {
-            setIsEditMode(true);
-            setCurrentPegawai(pegawai);
-            setFormData({
-                nama_lengkap: pegawai.nama_lengkap,
-                NIK: pegawai.NIK,
-                jabatan: pegawai.jabatan,
-                unit_kerja: pegawai.unit_kerja
-            });
-        } else {
-            setIsEditMode(false);
-            setCurrentPegawai(null);
-            setFormData({ nama_lengkap: '', NIK: '', jabatan: '', unit_kerja: '' });
-        }
-        setIsModalOpen(true);
-    };
-
+    const handleShowModal = () => setShowModal(true);
     const handleCloseModal = () => {
-        setIsModalOpen(false);
+        setShowModal(false);
+        setIsEditMode(false);
         setCurrentPegawai(null);
+        setFormData({
+            nama_lengkap: '',
+            NIK: '',
+            jabatan: '',
+            unit_kerja: '',
+        });
     };
 
-    const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-        if (isEditMode) {
-            // Pastikan ID pegawai dikirimkan dengan benar
-            await apiClient.put(`/pegawai/${currentPegawai.id_pegawai}`, formData);
-            Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
-        } else {
-            await apiClient.post('/pegawai', formData);
-            Swal.fire('Sukses', 'Data pegawai berhasil ditambahkan.', 'success');
-        }
-        fetchPegawai(pagination.currentPage);
-        handleCloseModal();
-    } catch (error) {
-        console.error('Error submitting form:', error);
-        Swal.fire('Error', 'Gagal menyimpan data pegawai.', 'error');
-    }
-};
+    // FUNGSI UNTUK MENANGANI KLIK EDIT
+    const handleEdit = (pegawaiData) => {
+        // Log ini akan menampilkan seluruh data dari baris yang tombol editnya diklik
+        console.log("Data Pegawai yang di-klik Edit:", pegawaiData);
 
-    const handleDelete = (id) => {
-    Swal.fire({
-        title: 'Anda yakin?',
-        text: "Data yang dihapus tidak dapat dikembalikan!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, hapus!',
-        cancelButtonText: 'Batal'
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            try {
-                // Pastikan ID pegawai dikirimkan dengan benar
-                await apiClient.delete(`/pegawai/${id}`);
-                Swal.fire('Dihapus!', 'Data pegawai telah dihapus.', 'success');
-                fetchPegawai(pagination.currentPage);
-            } catch (error) {
-                Swal.fire('Error', 'Gagal menghapus data.', 'error');
+        setIsEditMode(true);
+        setCurrentPegawai(pegawaiData);
+        setFormData({
+            nama_lengkap: pegawaiData.nama_lengkap,
+            NIK: pegawaiData.NIK,
+            jabatan: pegawaiData.jabatan,
+            unit_kerja: pegawaiData.unit_kerja,
+        });
+        handleShowModal();
+    };
+
+    // FUNGSI UNTUK SUBMIT DATA (CREATE & UPDATE)
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        // Log ini akan menampilkan state pegawai saat ini sebelum data dikirim
+        console.log("Submitting with currentPegawai:", currentPegawai);
+
+        try {
+            if (isEditMode) {
+                // Pengecekan krusial: pastikan id_pegawai ada sebelum mengirim
+                if (!currentPegawai || !currentPegawai.id_pegawai) {
+                    console.error("GAGAL EDIT: id_pegawai tidak ada atau undefined!", currentPegawai);
+                    Swal.fire('Error', 'ID Pegawai tidak ditemukan saat akan mengupdate.', 'error');
+                    return; // Hentikan eksekusi jika ID tidak ada
+                }
+                await apiClient.put(`/pegawai/${currentPegawai.id_pegawai}`, formData);
+                Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
+            } else {
+                await apiClient.post('/pegawai', formData);
+                Swal.fire('Sukses', 'Data pegawai berhasil ditambahkan.', 'success');
             }
+            fetchPegawai(pagination.currentPage);
+            handleCloseModal();
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            Swal.fire('Error', 'Gagal menyimpan data pegawai.', 'error');
         }
-    });
-};
-    
+    };
+
+    // FUNGSI UNTUK MENGHAPUS DATA
+    const handleDelete = (id) => {
+        // Log ini akan menampilkan ID yang akan dihapus
+        console.log("ID untuk dihapus:", id);
+
+        Swal.fire({
+            title: 'Anda yakin?',
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    // Pengecekan krusial: pastikan ID ada sebelum menghapus
+                    if (!id) {
+                        console.error("GAGAL HAPUS: ID yang dikirim undefined.");
+                        Swal.fire('Error', 'ID Pegawai tidak ditemukan saat akan menghapus.', 'error');
+                        return; // Hentikan eksekusi jika ID tidak ada
+                    }
+                    await apiClient.delete(`/pegawai/${id}`);
+                    Swal.fire('Dihapus!', 'Data pegawai telah dihapus.', 'success');
+                    fetchPegawai(pagination.currentPage);
+                } catch (error) {
+                    console.error('Error deleting data:', error);
+                    Swal.fire('Error', 'Gagal menghapus data.', 'error');
+                }
+            }
+        });
+    };
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
     const handlePageChange = (newPage) => {
-        if (newPage >= 1 && newPage <= pagination.totalPages) {
-            setPagination(prev => ({ ...prev, currentPage: newPage }));
-        }
+        setPagination(prev => ({ ...prev, currentPage: newPage }));
     };
 
     return (
-        <div className="space-y-6">
-            {/* --- HEADER BARU SESUAI GAMBAR --- */}
-            <PageHeader 
-                title="Manajemen Pegawai" 
-                subtitle="Kelola data master semua pegawai di perusahaan" 
-                icon={<Users size={28} />} 
-            />
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Manajemen Pegawai</h1>
+
+            <div className="flex justify-between mb-4">
+                <button
+                    onClick={() => {
+                        setIsEditMode(false);
+                        handleShowModal();
+                    }}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                >
+                    Tambah Pegawai
+                </button>
+                <input
+                    type="text"
+                    placeholder="Cari pegawai..."
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    className="border p-2 rounded w-1/3"
+                />
+            </div>
             
-            <button onClick={() => handleOpenModal()} className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors">
-                <PlusCircle size={20} />
-                Tambah Pegawai Baru
-            </button>
-
-            <div className="bg-white rounded-lg shadow-md">
-                <div className="p-4 border-b">
-                    <h3 className="text-lg font-bold text-gray-800">Daftar Semua Pegawai</h3>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left text-gray-700">
-                        <thead className="text-xs text-gray-800 uppercase bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3">No</th>
-                                <th className="px-6 py-3">Nama Lengkap</th>
-                                <th className="px-6 py-3">NIK</th>
-                                <th className="px-6 py-3">Jabatan</th>
-                                <th className="px-6 py-3">Unit Kerja</th>
-                                <th className="px-6 py-3 text-center">Aksi</th>
+            <div className="overflow-x-auto">
+                <table className="min-w-full bg-white">
+                    <thead className="bg-gray-800 text-white">
+                        <tr>
+                            <th className="py-2 px-4 border-b">No</th>
+                            <th className="py-2 px-4 border-b">Nama Lengkap</th>
+                            <th className="py-2 px-4 border-b">NIK</th>
+                            <th className="py-2 px-4 border-b">Jabatan</th>
+                            <th className="py-2 px-4 border-b">Unit Kerja</th>
+                            <th className="py-2 px-4 border-b">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pegawai.map((item, index) => (
+                            <tr key={item.id_pegawai || index}>
+                                <td className="py-2 px-4 border-b text-center">{(pagination.currentPage - 1) * 10 + index + 1}</td>
+                                <td className="py-2 px-4 border-b">{item.nama_lengkap}</td>
+                                <td className="py-2 px-4 border-b">{item.NIK}</td>
+                                <td className="py-2 px-4 border-b">{item.jabatan}</td>
+                                <td className="py-2 px-4 border-b">{item.unit_kerja}</td>
+                                <td className="py-2 px-4 border-b text-center">
+                                    <button
+                                        onClick={() => handleEdit(item)}
+                                        className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded mr-2"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={() => handleDelete(item.id_pegawai)}
+                                        className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                                    >
+                                        Delete
+                                    </button>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {loading ? (
-                                <tr><td colSpan="6" className="text-center py-4">Memuat data...</td></tr>
-                            ) : pegawaiList.length > 0 ? (
-                                pegawaiList.map((pegawai, index) => (
-                                    <tr key={pegawai.id_pegawai} className="bg-white border-b hover:bg-gray-50">
-                                        <td className="px-6 py-4">{(pagination.currentPage - 1) * 10 + index + 1}</td>
-                                        <td className="px-6 py-4 font-medium text-gray-900">{pegawai.nama_lengkap}</td>
-                                        <td className="px-6 py-4">{pegawai.NIK}</td>
-                                        <td className="px-6 py-4">{pegawai.jabatan}</td>
-                                        <td className="px-6 py-4">{pegawai.unit_kerja}</td>
-                                        <td className="px-6 py-4 text-center">
-                                            <div className="flex justify-center items-center gap-2">
-                                                <button onClick={() => handleOpenModal(pegawai)} className="text-blue-600 hover:text-blue-800"><Edit size={18} /></button>
-                                                <button onClick={() => handleDelete(pegawai.id_pegawai)} className="text-red-600 hover:text-red-800"><Trash2 size={18} /></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr><td colSpan="6" className="text-center py-4">Tidak ada data pegawai.</td></tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
-                <div className="p-4 border-t flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
-                        Halaman {pagination.currentPage} dari {pagination.totalPages} ({pagination.totalPegawai} total pegawai)
-                    </span>
-                    <div className="inline-flex items-center gap-2">
-                        <button 
-                            onClick={() => handlePageChange(pagination.currentPage - 1)}
-                            disabled={pagination.currentPage === 1}
-                            className="px-3 py-1 border rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            <div className="flex justify-between items-center mt-4">
+                <p>Total Pegawai: {pagination.totalItems}</p>
+                <div>
+                    {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map(page => (
+                        <button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            className={`px-3 py-1 border rounded ${pagination.currentPage === page ? 'bg-blue-500 text-white' : ''}`}
                         >
-                            <ChevronLeft size={18} />
+                            {page}
                         </button>
-                        <button 
-                            onClick={() => handlePageChange(pagination.currentPage + 1)}
-                            disabled={pagination.currentPage === pagination.totalPages}
-                            className="px-3 py-1 border rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <ChevronRight size={18} />
-                        </button>
-                    </div>
+                    ))}
                 </div>
             </div>
 
-            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={isEditMode ? 'Edit Data Pegawai' : 'Tambah Pegawai Baru'}>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Nama Lengkap</label>
-                        <input type="text" name="nama_lengkap" value={formData.nama_lengkap} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"/>
+            <Modal show={showModal} onClose={handleCloseModal} title={isEditMode ? 'Edit Pegawai' : 'Tambah Pegawai'}>
+                <form onSubmit={handleSubmit}>
+                    {/* ... form fields ... */}
+                    <div className="mb-4">
+                        <label className="block text-gray-700">Nama Lengkap</label>
+                        <input type="text" name="nama_lengkap" value={formData.nama_lengkap} onChange={handleInputChange} className="w-full p-2 border rounded" required />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">NIK</label>
-                        <input type="text" name="NIK" value={formData.NIK} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"/>
+                    <div className="mb-4">
+                        <label className="block text-gray-700">NIK</label>
+                        <input type="text" name="NIK" value={formData.NIK} onChange={handleInputChange} className="w-full p-2 border rounded" required />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Jabatan</label>
-                        <input type="text" name="jabatan" value={formData.jabatan} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"/>
+                    <div className="mb-4">
+                        <label className="block text-gray-700">Jabatan</label>
+                        <input type="text" name="jabatan" value={formData.jabatan} onChange={handleInputChange} className="w-full p-2 border rounded" required />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Unit Kerja</label>
-                        <select name="unit_kerja" value={formData.unit_kerja} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Pilih Unit Kerja</option>
-                            {unitKerjaOptions.map(unit => <option key={unit} value={unit}>{unit}</option>)}
-                        </select>
+                    <div className="mb-4">
+                        <label className="block text-gray-700">Unit Kerja</label>
+                        <input type="text" name="unit_kerja" value={formData.unit_kerja} onChange={handleInputChange} className="w-full p-2 border rounded" required />
                     </div>
-                    <div className="flex justify-end gap-3 pt-4">
-                        <button type="button" onClick={handleCloseModal} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Batal</button>
-                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Simpan</button>
+                    <div className="flex justify-end">
+                        <button type="button" onClick={handleCloseModal} className="bg-gray-500 text-white px-4 py-2 rounded mr-2">Batal</button>
+                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Simpan</button>
                     </div>
                 </form>
             </Modal>

@@ -99,7 +99,7 @@ const ManajemenPegawaiPage = () => {
     try {
         if (isEditMode) {
             // Pastikan ID pegawai dikirimkan dengan benar
-            await apiClient.put(`/pegawai/${currentPegawai.id_pegawai}`, formData);
+            await apiClient.put(`/pegawai/${currentPegawai.id}`, formData);
             Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
         } else {
             await apiClient.post('/pegawai', formData);
@@ -178,7 +178,7 @@ const ManajemenPegawaiPage = () => {
                                 <tr><td colSpan="6" className="text-center py-4">Memuat data...</td></tr>
                             ) : pegawaiList.length > 0 ? (
                                 pegawaiList.map((pegawai, index) => (
-                                    <tr key={pegawai.id_pegawai} className="bg-white border-b hover:bg-gray-50">
+                                    <tr key={pegawai.id} className="bg-white border-b hover:bg-gray-50">
                                         <td className="px-6 py-4">{(pagination.currentPage - 1) * 10 + index + 1}</td>
                                         <td className="px-6 py-4 font-medium text-gray-900">{pegawai.nama_lengkap}</td>
                                         <td className="px-6 py-4">{pegawai.NIK}</td>
@@ -187,7 +187,7 @@ const ManajemenPegawaiPage = () => {
                                         <td className="px-6 py-4 text-center">
                                             <div className="flex justify-center items-center gap-2">
                                                 <button onClick={() => handleOpenModal(pegawai)} className="text-blue-600 hover:text-blue-800"><Edit size={18} /></button>
-                                                <button onClick={() => handleDelete(pegawai.id_pegawai)} className="text-red-600 hover:text-red-800"><Trash2 size={18} /></button>
+                                                <button onClick={() => handleDelete(pegawai.id)} className="text-red-600 hover:text-red-800"><Trash2 size={18} /></button>
                                             </div>
                                         </td>
                                     </tr>

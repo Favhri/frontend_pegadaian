@@ -25,7 +25,7 @@ const ManajemenPegawaiPage = () => {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
-    const [currentPegawai, setCurrentPegawai] = useState(null);
+    // const [currentPegawai, setCurrentPegawai] = useState(null);
     const [pagination, setPagination] = useState({
         currentPage: 1,
         totalPages: 1,
@@ -33,6 +33,7 @@ const ManajemenPegawaiPage = () => {
     });
     
     const [formData, setFormData] = useState({
+        id_pegawai: null,
         nama_lengkap: '',
         NIK: '',
         jabatan: '',
@@ -72,22 +73,23 @@ const ManajemenPegawaiPage = () => {
     };
 
     const handleOpenModal = (pegawai = null) => {
-        if (pegawai) {
-            setIsEditMode(true);
-            setCurrentPegawai(pegawai);
-            setFormData({
-                nama_lengkap: pegawai.nama_lengkap,
-                NIK: pegawai.NIK,
-                jabatan: pegawai.jabatan,
-                unit_kerja: pegawai.unit_kerja
-            });
-        } else {
-            setIsEditMode(false);
-            setCurrentPegawai(null);
-            setFormData({ nama_lengkap: '', NIK: '', jabatan: '', unit_kerja: '' });
-        }
-        setIsModalOpen(true);
-    };
+    if (pegawai) {
+        // Langsung set semua data pegawai ke formData
+        setIsEditMode(true);
+        setFormData(pegawai); 
+    } else {
+        // Reset formData untuk mode tambah data baru
+        setIsEditMode(false);
+        setFormData({
+            id_pegawai: null,
+            nama_lengkap: '',
+            NIK: '',
+            jabatan: '',
+            unit_kerja: ''
+        });
+    }
+    setIsModalOpen(true);
+};
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -98,15 +100,8 @@ const ManajemenPegawaiPage = () => {
     e.preventDefault();
     try {
         if (isEditMode) {
-            // --- TAMBAHKAN PENGECEKAN DI SINI ---
-            if (!currentPegawai || currentPegawai.id_pegawai == null) {
-                Swal.fire('Error', 'ID Pegawai tidak valid atau tidak ditemukan. Gagal memperbarui data.', 'error');
-                console.error("Gagal update: ID Pegawai tidak ditemukan pada state 'currentPegawai'.");
-                return; // Hentikan eksekusi
-            }
-            // ------------------------------------
-
-            await apiClient.put(`/pegawai/${currentPegawai.id_pegawai}`, formData);
+            // Ambil ID dari formData, bukan currentPegawai lagi
+            await apiClient.put(`/pegawai/${formData.id_pegawai}`, formData);
             Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
         } else {
             await apiClient.post('/pegawai', formData);

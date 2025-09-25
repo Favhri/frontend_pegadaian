@@ -125,7 +125,7 @@ const ManajemenPegawaiPage = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await apiClient.delete(`/pegawai/${id}`);
+                    await apiClient.delete(`/pegawai/${id_pegawai}`);
                     Swal.fire('Dihapus!', 'Data pegawai telah dihapus.', 'success');
                     fetchPegawai(pagination.currentPage);
                 } catch (error) {

@@ -4,7 +4,7 @@ import apiClient from '../../api/axios';
 import { Users, PlusCircle, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import Modal from '../../components/Modal';
 
-// Komponen Header dikembalikan sesuai permintaan gambar
+// Komponen Header tidak perlu diubah
 const PageHeader = ({ title, subtitle, icon }) => (
     <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-6 text-white shadow-lg">
         <div className="flex items-center gap-4">
@@ -19,7 +19,6 @@ const PageHeader = ({ title, subtitle, icon }) => (
     </div>
 );
 
-
 const ManajemenPegawaiPage = () => {
     const [pegawaiList, setPegawaiList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -29,14 +28,16 @@ const ManajemenPegawaiPage = () => {
         totalPages: 1,
         totalPegawai: 0
     });
-    
-    const [formData, setFormData] = useState({
+
+    // --- PERUBAHAN #1: State disatukan ---
+    const initialFormData = {
         id_pegawai: null,
         nama_lengkap: '',
         NIK: '',
         jabatan: '',
         unit_kerja: ''
-    });
+    };
+    const [formData, setFormData] = useState(initialFormData);
 
     const unitKerjaOptions = [
         "CP TERANDAM", "UPC BANDAR BUAT", "UPC INDARUNG", "UPC MATA AIR", "UPC ALAI",
@@ -70,48 +71,48 @@ const ManajemenPegawaiPage = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    // --- PERUBAHAN #2: Logika membuka modal disederhanakan ---
     const handleOpenModal = (pegawai = null) => {
-    if (pegawai) {
-        // Mode Edit: Salin semua data pegawai ke dalam form
-        setFormData(pegawai);
-    } else {
-        // Mode Tambah: Reset form ke kondisi awal
-        setFormData({
-            id_pegawai: null,
-            nama_lengkap: '',
-            NIK: '',
-            jabatan: '',
-            unit_kerja: ''
-        });
-    }
-    setIsModalOpen(true);
-};
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        
+        if (pegawai) {
+            // Mode Edit: Salin semua data pegawai ke form
+            setFormData(pegawai);
+        } else {
+            // Mode Tambah: Reset form ke kondisi awal
+            setFormData(initialFormData);
+        }
+        setIsModalOpen(true);
     };
 
+    // --- PERUBAHAN #3: Logika menutup modal disederhanakan ---
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        // Tidak perlu reset state di sini
+    };
+
+    // --- PERUBAHAN #4: Logika submit disatukan ---
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-        // Cek apakah ada id_pegawai di dalam formData
-        if (formData.id_pegawai) {
-            // Jika ada, berarti ini mode EDIT
-            await apiClient.put(`/pegawai/${formData.id_pegawai}`, formData);
-            Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
-        } else {
-            // Jika tidak ada, berarti ini mode TAMBAH
-            await apiClient.post('/pegawai', formData);
-            Swal.fire('Sukses', 'Data pegawai berhasil ditambahkan.', 'success');
+        e.preventDefault();
+        // Tentukan apakah ini mode edit atau tambah berdasarkan adanya id_pegawai
+        const isEditMode = formData.id_pegawai != null;
+
+        try {
+            if (isEditMode) {
+                // Panggil API PUT untuk update
+                await apiClient.put(`/pegawai/${formData.id_pegawai}`, formData);
+                Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
+            } else {
+                // Panggil API POST untuk membuat data baru
+                await apiClient.post('/pegawai', formData);
+                Swal.fire('Sukses', 'Data pegawai berhasil ditambahkan.', 'success');
+            }
+            fetchPegawai(pagination.currentPage);
+            handleCloseModal();
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            const errorMessage = error.response?.data?.message || 'Gagal menyimpan data pegawai.';
+            Swal.fire('Error', errorMessage, 'error');
         }
-        fetchPegawai(pagination.currentPage);
-        handleCloseModal();
-    } catch (error) {
-        console.error('Error submitting form:', error);
-        Swal.fire('Error', 'Gagal menyimpan data pegawai.', 'error');
-    }
-};
+    };
 
     const handleDelete = (id) => {
         Swal.fire({
@@ -144,7 +145,6 @@ const ManajemenPegawaiPage = () => {
 
     return (
         <div className="space-y-6">
-            {/* --- HEADER BARU SESUAI GAMBAR --- */}
             <PageHeader 
                 title="Manajemen Pegawai" 
                 subtitle="Kelola data master semua pegawai di perusahaan" 
@@ -221,6 +221,7 @@ const ManajemenPegawaiPage = () => {
                 </div>
             </div>
 
+            {/* --- PERUBAHAN #5: Judul modal diperbaiki --- */}
             <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={formData.id_pegawai ? 'Edit Data Pegawai' : 'Tambah Pegawai Baru'}>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>

@@ -95,45 +95,47 @@ const ManajemenPegawaiPage = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            if (isEditMode) {
-                await apiClient.put(`/pegawai/${currentPegawai.id_pegawai}`, formData);
-                Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
-            } else {
-                await apiClient.post('/pegawai', formData);
-                Swal.fire('Sukses', 'Data pegawai berhasil ditambahkan.', 'success');
-            }
-            fetchPegawai(pagination.currentPage);
-            handleCloseModal();
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            Swal.fire('Error', 'Gagal menyimpan data pegawai.', 'error');
+    e.preventDefault();
+    try {
+        if (isEditMode) {
+            // Pastikan ID pegawai dikirimkan dengan benar
+            await apiClient.put(`/pegawai/${currentPegawai.id_pegawai}`, formData);
+            Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
+        } else {
+            await apiClient.post('/pegawai', formData);
+            Swal.fire('Sukses', 'Data pegawai berhasil ditambahkan.', 'success');
         }
-    };
+        fetchPegawai(pagination.currentPage);
+        handleCloseModal();
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        Swal.fire('Error', 'Gagal menyimpan data pegawai.', 'error');
+    }
+};
 
     const handleDelete = (id) => {
-        Swal.fire({
-            title: 'Anda yakin?',
-            text: "Data yang dihapus tidak dapat dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal'
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                try {
-                    await apiClient.delete(`/pegawai/${id}`);
-                    Swal.fire('Dihapus!', 'Data pegawai telah dihapus.', 'success');
-                    fetchPegawai(pagination.currentPage);
-                } catch (error) {
-                    Swal.fire('Error', 'Gagal menghapus data.', 'error');
-                }
+    Swal.fire({
+        title: 'Anda yakin?',
+        text: "Data yang dihapus tidak dapat dikembalikan!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                // Pastikan ID pegawai dikirimkan dengan benar
+                await apiClient.delete(`/pegawai/${id}`);
+                Swal.fire('Dihapus!', 'Data pegawai telah dihapus.', 'success');
+                fetchPegawai(pagination.currentPage);
+            } catch (error) {
+                Swal.fire('Error', 'Gagal menghapus data.', 'error');
             }
-        });
-    };
+        }
+    });
+};
     
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= pagination.totalPages) {

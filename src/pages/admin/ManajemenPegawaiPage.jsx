@@ -95,22 +95,30 @@ const ManajemenPegawaiPage = () => {
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            if (isEditMode) {
-                await apiClient.put(`/pegawai/${currentPegawai.id_pegawai}`, formData);
-                Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
-            } else {
-                await apiClient.post('/pegawai', formData);
-                Swal.fire('Sukses', 'Data pegawai berhasil ditambahkan.', 'success');
+    e.preventDefault();
+    try {
+        if (isEditMode) {
+            // --- TAMBAHKAN PENGECEKAN DI SINI ---
+            if (!currentPegawai || currentPegawai.id_pegawai == null) {
+                Swal.fire('Error', 'ID Pegawai tidak valid atau tidak ditemukan. Gagal memperbarui data.', 'error');
+                console.error("Gagal update: ID Pegawai tidak ditemukan pada state 'currentPegawai'.");
+                return; // Hentikan eksekusi
             }
-            fetchPegawai(pagination.currentPage);
-            handleCloseModal();
-        } catch (error) {
-            console.error('Error submitting form:', error);
-            Swal.fire('Error', 'Gagal menyimpan data pegawai.', 'error');
+            // ------------------------------------
+
+            await apiClient.put(`/pegawai/${currentPegawai.id_pegawai}`, formData);
+            Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
+        } else {
+            await apiClient.post('/pegawai', formData);
+            Swal.fire('Sukses', 'Data pegawai berhasil ditambahkan.', 'success');
         }
-    };
+        fetchPegawai(pagination.currentPage);
+        handleCloseModal();
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        Swal.fire('Error', 'Gagal menyimpan data pegawai.', 'error');
+    }
+};
 
     const handleDelete = (id) => {
         Swal.fire({

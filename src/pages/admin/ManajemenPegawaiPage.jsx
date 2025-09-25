@@ -67,13 +67,12 @@ const ManajemenPegawaiPage = () => {
         e.preventDefault();
         try {
             if (isEditMode) {
-                // PENGECEKAN & DEBUGGING: Pastikan currentPegawai dan id_pegawai ada
-                console.log("Data yang akan di-UPDATE:", currentPegawai);
-                if (!currentPegawai || !currentPegawai.id_pegawai) {
+                // ## PERBAIKAN DI SINI: Menggunakan currentPegawai.id ##
+                if (!currentPegawai || !currentPegawai.id) {
                     Swal.fire('Error', 'Gagal mengedit data: ID Pegawai tidak ditemukan.', 'error');
                     return;
                 }
-                await apiClient.put(`/pegawai/${currentPegawai.id_pegawai}`, formData);
+                await apiClient.put(`/pegawai/${currentPegawai.id}`, formData);
                 Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
             } else {
                 await apiClient.post('/pegawai', formData);
@@ -88,8 +87,6 @@ const ManajemenPegawaiPage = () => {
     };
 
     const handleDelete = (id) => {
-        // DEBUGGING: Cek ID yang akan dihapus
-        console.log("ID yang akan di-DELETE:", id);
         Swal.fire({
             title: 'Anda yakin?',
             text: "Data yang dihapus tidak dapat dikembalikan!",
@@ -102,7 +99,6 @@ const ManajemenPegawaiPage = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    // PENGECEKAN: Pastikan ID tidak null/undefined sebelum request
                     if (!id) {
                          Swal.fire('Error', 'Gagal menghapus data: ID Pegawai tidak ditemukan.', 'error');
                          return;
@@ -164,7 +160,8 @@ const ManajemenPegawaiPage = () => {
                     </thead>
                     <tbody>
                         {pegawai.map((item, index) => (
-                            <tr key={item.id_pegawai || index}>
+                            // ## PERBAIKAN DI SINI: Menggunakan key item.id ##
+                            <tr key={item.id || index}>
                                 <td className="py-2 px-4 border-b text-center">{(pagination.currentPage - 1) * 10 + index + 1}</td>
                                 <td className="py-2 px-4 border-b">{item.nama_lengkap}</td>
                                 <td className="py-2 px-4 border-b">{item.NIK}</td>
@@ -173,8 +170,6 @@ const ManajemenPegawaiPage = () => {
                                 <td className="py-2 px-4 border-b text-center">
                                     <button
                                         onClick={() => {
-                                            // DEBUGGING: Cek data 'item' saat tombol edit diklik
-                                            console.log("Data Pegawai yang di-klik Edit:", item);
                                             setIsEditMode(true);
                                             setCurrentPegawai(item);
                                             setFormData({
@@ -190,7 +185,8 @@ const ManajemenPegawaiPage = () => {
                                         Edit
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(item.id_pegawai)}
+                                        // ## PERBAIKAN DI SINI: Mengirim item.id ke handleDelete ##
+                                        onClick={() => handleDelete(item.id)}
                                         className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
                                     >
                                         Delete

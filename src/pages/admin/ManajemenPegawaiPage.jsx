@@ -1,16 +1,15 @@
+// favhri/frontend_pegadaian/frontend_pegadaian-e9f5c0623c6205de3cd604f6538f0c10734db53c/src/pages/admin/ManajemenPegawaiPage.jsx
+
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import apiClient from '../../api/axios';
 import { Users, PlusCircle, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import Modal from '../../components/Modal';
 
-// Komponen Header tidak perlu diubah
 const PageHeader = ({ title, subtitle, icon }) => (
     <div className="bg-gradient-to-r from-green-600 to-teal-500 rounded-lg p-6 text-white shadow-lg">
         <div className="flex items-center gap-4">
-            <div className="bg-white/20 p-3 rounded-lg">
-                {icon}
-            </div>
+            <div className="bg-white/20 p-3 rounded-lg">{icon}</div>
             <div>
                 <h1 className="text-2xl font-bold">{title}</h1>
                 <p className="text-green-100">{subtitle}</p>
@@ -23,13 +22,9 @@ const ManajemenPegawaiPage = () => {
     const [pegawaiList, setPegawaiList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [pagination, setPagination] = useState({
-        currentPage: 1,
-        totalPages: 1,
-        totalPegawai: 0
-    });
+    const [pagination, setPagination] = useState({ currentPage: 1, totalPages: 1, totalPegawai: 0 });
 
-    // --- PERUBAHAN #1: State disatukan ---
+    // State disatukan untuk form, baik untuk tambah maupun edit
     const initialFormData = {
         id_pegawai: null,
         nama_lengkap: '',
@@ -39,23 +34,17 @@ const ManajemenPegawaiPage = () => {
     };
     const [formData, setFormData] = useState(initialFormData);
 
-    const unitKerjaOptions = [
-        "CP TERANDAM", "UPC BANDAR BUAT", "UPC INDARUNG", "UPC MATA AIR", "UPC ALAI",
-        "UPC SITEBA", "UPC BALAI BARU", "UPC BELIMBING", "UPC ANDURING", "UPC PARAK LAWEH"
-    ];
+    const unitKerjaOptions = ["CP TERANDAM", "UPC BANDAR BUAT", "UPC INDARUNG", "UPC MATA AIR", "UPC ALAI", "UPC SITEBA", "UPC BALAI BARU", "UPC BELIMBING", "UPC ANDURING", "UPC PARAK LAWEH"];
 
     const fetchPegawai = async (page = 1) => {
         setLoading(true);
         try {
-            const response = await apiClient.get('/pegawai', {
-                params: { page, limit: 10 }
-            });
+            const response = await apiClient.get('/pegawai', { params: { page, limit: 10 } });
             if (response.data.success) {
                 setPegawaiList(response.data.data);
                 setPagination(response.data.pagination);
             }
         } catch (error) {
-            console.error('Error fetching pegawai:', error);
             Swal.fire('Error', 'Gagal memuat data master pegawai.', 'error');
         } finally {
             setLoading(false);
@@ -71,10 +60,9 @@ const ManajemenPegawaiPage = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    // --- PERUBAHAN #2: Logika membuka modal disederhanakan ---
     const handleOpenModal = (pegawai = null) => {
         if (pegawai) {
-            // Mode Edit: Salin semua data pegawai ke form
+            // Mode Edit: Salin seluruh data pegawai (termasuk ID) ke form
             setFormData(pegawai);
         } else {
             // Mode Tambah: Reset form ke kondisi awal
@@ -83,25 +71,17 @@ const ManajemenPegawaiPage = () => {
         setIsModalOpen(true);
     };
 
-    // --- PERUBAHAN #3: Logika menutup modal disederhanakan ---
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-        // Tidak perlu reset state di sini
-    };
+    const handleCloseModal = () => setIsModalOpen(false);
 
-    // --- PERUBAHAN #4: Logika submit disatukan ---
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Tentukan apakah ini mode edit atau tambah berdasarkan adanya id_pegawai
         const isEditMode = formData.id_pegawai != null;
 
         try {
             if (isEditMode) {
-                // Panggil API PUT untuk update
                 await apiClient.put(`/pegawai/${formData.id_pegawai}`, formData);
                 Swal.fire('Sukses', 'Data pegawai berhasil diperbarui.', 'success');
             } else {
-                // Panggil API POST untuk membuat data baru
                 await apiClient.post('/pegawai', formData);
                 Swal.fire('Sukses', 'Data pegawai berhasil ditambahkan.', 'success');
             }
@@ -114,9 +94,9 @@ const ManajemenPegawaiPage = () => {
         }
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (pegawai) => {
         Swal.fire({
-            title: 'Anda yakin?',
+            title: `Anda yakin ingin menghapus ${pegawai.nama_lengkap}?`,
             text: "Data yang dihapus tidak dapat dikembalikan!",
             icon: 'warning',
             showCancelButton: true,
@@ -127,7 +107,7 @@ const ManajemenPegawaiPage = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await apiClient.delete(`/pegawai/${id}`);
+                    await apiClient.delete(`/pegawai/${pegawai.id_pegawai}`);
                     Swal.fire('Dihapus!', 'Data pegawai telah dihapus.', 'success');
                     fetchPegawai(pagination.currentPage);
                 } catch (error) {
@@ -186,7 +166,7 @@ const ManajemenPegawaiPage = () => {
                                         <td className="px-6 py-4 text-center">
                                             <div className="flex justify-center items-center gap-2">
                                                 <button onClick={() => handleOpenModal(pegawai)} className="text-blue-600 hover:text-blue-800"><Edit size={18} /></button>
-                                                <button onClick={() => handleDelete(pegawai.id_pegawai)} className="text-red-600 hover:text-red-800"><Trash2 size={18} /></button>
+                                                <button onClick={() => handleDelete(pegawai)} className="text-red-600 hover:text-red-800"><Trash2 size={18} /></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -197,31 +177,15 @@ const ManajemenPegawaiPage = () => {
                         </tbody>
                     </table>
                 </div>
-
                 <div className="p-4 border-t flex justify-between items-center">
-                    <span className="text-sm text-gray-600">
-                        Halaman {pagination.currentPage} dari {pagination.totalPages} ({pagination.totalPegawai} total pegawai)
-                    </span>
+                    <span className="text-sm text-gray-600">Halaman {pagination.currentPage} dari {pagination.totalPages} ({pagination.totalPegawai} total pegawai)</span>
                     <div className="inline-flex items-center gap-2">
-                        <button 
-                            onClick={() => handlePageChange(pagination.currentPage - 1)}
-                            disabled={pagination.currentPage === 1}
-                            className="px-3 py-1 border rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <ChevronLeft size={18} />
-                        </button>
-                        <button 
-                            onClick={() => handlePageChange(pagination.currentPage + 1)}
-                            disabled={pagination.currentPage === pagination.totalPages}
-                            className="px-3 py-1 border rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <ChevronRight size={18} />
-                        </button>
+                        <button onClick={() => handlePageChange(pagination.currentPage - 1)} disabled={pagination.currentPage === 1} className="px-3 py-1 border rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"><ChevronLeft size={18} /></button>
+                        <button onClick={() => handlePageChange(pagination.currentPage + 1)} disabled={pagination.currentPage === pagination.totalPages} className="px-3 py-1 border rounded-md bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"><ChevronRight size={18} /></button>
                     </div>
                 </div>
             </div>
 
-            {/* --- PERUBAHAN #5: Judul modal diperbaiki --- */}
             <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={formData.id_pegawai ? 'Edit Data Pegawai' : 'Tambah Pegawai Baru'}>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>

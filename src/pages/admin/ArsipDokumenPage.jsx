@@ -266,7 +266,7 @@ const ArsipDokumenPage = () => {
                                         <td className="py-3 px-4 text-sm text-gray-500">{formatFileSize(doc.file_size)}</td>
                                         <td className="py-3 px-4"><div className="flex items-center gap-2">
                                             <button onClick={() => handlePreview(doc.file_name)} className="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100"><Eye size={18} /></button>
-                                            <button onClick={() => handleDownload(doc.id, doc.nama_dokumen)} className="text-gray-500 hover:text-green-600 p-2 rounded-full hover:bg-gray-100"><Download size={18} /></button>
+                                            <button onClick={() => handleDownload(doc.id, doc.file_name)} className="text-gray-500 hover:text-green-600 p-2 rounded-full hover:bg-gray-100"><Download size={18} /></button>
                                             <button onClick={() => handleDelete(doc.id)} className="text-gray-500 hover:text-red-600 p-2 rounded-full hover:bg-gray-100"><Trash2 size={18} /></button>
                                         </div></td>
                                     </tr>

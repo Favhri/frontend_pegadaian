@@ -171,20 +171,37 @@ const ArsipDokumenUserPage = () => {
     const fileUrl = `${baseUrl}/uploads/${fileName}`;
     window.open(fileUrl, '_blank', 'noopener,noreferrer');
 };
-    const handleDownload = async (id, nama_dokumen) => {
-        try {
-            const response = await apiClient.get(`/arsip/download/${id}`, { responseType: 'blob' });
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', nama_dokumen);
-            document.body.appendChild(link);
-            link.click();
-            link.parentNode.removeChild(link);
-        } catch (error) {
-            Swal.fire('Error', 'Gagal mengunduh file.', 'error');
-        }
-    };
+    const handleDownload = async (id, nama_dokumen, file_name) => {
+    try {
+        const response = await apiClient.get(`/arsip/download/${id}`, {
+            responseType: 'blob', // Ini bagian paling penting!
+        });
+
+        // Dapatkan ekstensi dari nama file asli
+        const fileExtension = file_name.split('.').pop();
+        
+        // Buat nama file download yang lengkap dengan ekstensinya
+        const downloadFilename = `${nama_dokumen}.${fileExtension}`;
+
+        // Buat URL sementara dari data blob yang diterima
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        
+        // Buat link virtual untuk memulai download
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', downloadFilename); // Set nama file di sini
+        document.body.appendChild(link);
+        link.click();
+
+        // Hapus link setelah selesai
+        link.parentNode.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+    } catch (error) {
+        console.error('Error downloading file:', error);
+        alert('Gagal mengunduh file.');
+    }
+};
 
     return (
         <div className="bg-gray-50 min-h-screen p-6 space-y-6">

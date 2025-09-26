@@ -165,9 +165,10 @@ const ArsipDokumenPage = () => {
     };
 
     const handlePreview = (fileName) => {
-    // URL langsung ke file statis, bukan melalui /api
-    const url = `${apiClient.defaults.baseURL.replace('/api', '')}/uploads/${fileName}`;
-    window.open(url, '_blank');
+    // Buat URL dasar tanpa '/api/' di belakangnya
+    const baseUrl = 'https://api1.elangterbang.site';
+    const fileUrl = `${baseUrl}/uploads/${fileName}`;
+    window.open(fileUrl, '_blank', 'noopener,noreferrer');
 };
 
     const handleDownload = async (id, nama_dokumen) => {

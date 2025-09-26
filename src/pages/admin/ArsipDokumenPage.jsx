@@ -171,29 +171,24 @@ const ArsipDokumenPage = () => {
     window.open(fileUrl, '_blank', 'noopener,noreferrer');
 };
 
-    const handleDownload = async (id, nama_dokumen, file_name) => {
+    const handleDownload = async (id, nama_dokumen) => {
     try {
         const response = await apiClient.get(`/arsip/download/${id}`, {
-            responseType: 'blob', // Ini bagian paling penting!
+            responseType: 'blob', // Tetap pakai 'blob'
         });
 
-        // Dapatkan ekstensi dari nama file asli
-        const fileExtension = file_name.split('.').pop();
-        
-        // Buat nama file download yang lengkap dengan ekstensinya
-        const downloadFilename = `${nama_dokumen}.${fileExtension}`;
-
-        // Buat URL sementara dari data blob yang diterima
         const url = window.URL.createObjectURL(new Blob([response.data]));
-        
-        // Buat link virtual untuk memulai download
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', downloadFilename); // Set nama file di sini
+
+        // KOSONGKAN 'download', biarkan browser yang baca nama file dari server
+        // Ini akan otomatis pakai nama file yang benar (tidak akan jadi .txt)
+        link.setAttribute('download', ''); 
+        
         document.body.appendChild(link);
         link.click();
 
-        // Hapus link setelah selesai
+        // Bersihkan setelah download
         link.parentNode.removeChild(link);
         window.URL.revokeObjectURL(url);
 

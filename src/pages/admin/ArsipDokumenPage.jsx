@@ -172,30 +172,28 @@ const ArsipDokumenPage = () => {
 };
 
     const handleDownload = async (id, nama_dokumen) => {
-    try {
-        const response = await apiClient.get(`/arsip/download/${id}`, {
-            responseType: 'blob', // Tetap pakai 'blob'
-        });
+try {
+    const response = await apiClient.get(`/arsip/download/${id}`, {
+        responseType: 'blob',
+    });
 
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
 
-        // KOSONGKAN 'download', biarkan browser yang baca nama file dari server
-        // Ini akan otomatis pakai nama file yang benar (tidak akan jadi .txt)
-        link.setAttribute('download', ''); 
-        
-        document.body.appendChild(link);
-        link.click();
+    // Di sini kita berikan nama file yang benar
+    link.setAttribute('download', nama_dokumen); 
+    
+    document.body.appendChild(link);
+    link.click();
 
-        // Bersihkan setelah download
-        link.parentNode.removeChild(link);
-        window.URL.revokeObjectURL(url);
+    link.parentNode.removeChild(link);
+    window.URL.revokeObjectURL(url);
 
-    } catch (error) {
-        console.error('Error downloading file:', error);
-        alert('Gagal mengunduh file.');
-    }
+} catch (error) {
+    console.error('Error downloading file:', error);
+    alert('Gagal mengunduh file.');
+}
 };
     
     const handleDelete = (id) => {

@@ -46,7 +46,7 @@ const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) 
             const selectedPegawai = pegawaiList.find(p => p.NIK === initialData.NIK);
             if (selectedPegawai) {
                 // Menggunakan id_pegawai dari data pegawaiList
-                setFormData(prev => ({ ...prev, selectedPegawaiId: selectedPegawai.id_pegawai.toString() }));
+                setFormData(prev => ({ ...prev, selectedPegawaiId: selectedPegawai.id.toString() }));
             }
         }
     }, [initialData, pegawaiList]);
@@ -68,7 +68,7 @@ const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) 
     const handlePegawaiChange = (e) => {
     const selectedId = e.target.value;
     // Menambahkan pengecekan `p && p.id_pegawai` untuk keamanan
-    const selectedPegawai = pegawaiList.find(p => p && p.id_pegawai && p.id_pegawai.toString() === selectedId);
+    const selectedPegawai = pegawaiList.find(p => p && p.id && p.id.toString() === selectedId);
     setFormData(prev => ({
         ...prev,
         pegawai: selectedPegawai ? selectedPegawai.nama_lengkap : '',
@@ -94,7 +94,7 @@ const CutiForm = ({ onSave, pegawaiList, initialData = null, onCancel = null }) 
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nama Pegawai *</label>
                     <select name="pegawai" value={formData.selectedPegawaiId} onChange={handlePegawaiChange} className="w-full p-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-green-500" required>
                         <option value="">Pilih dari Data Master Pegawai</option>
-                        {pegawaiList.map(p => <option key={p.id_pegawai} value={p.id_pegawai}>{p.nama_lengkap} - NIK: {p.NIK}</option>)}
+                        {pegawaiList.map(p => <option key={p.id} value={p.id}>{p.nama_lengkap} - NIK: {p.NIK}</option>)}
                     </select>
                 </div>
                 <div>

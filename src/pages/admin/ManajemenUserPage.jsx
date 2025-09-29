@@ -93,7 +93,7 @@ const UserForm = ({ user, onClose, onSave }) => {
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Email</label><input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" required /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Password</label><input type="password" name="password" value={formData.password} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" placeholder={user ? "Kosongkan jika tidak diubah" : ""} /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-1">Konfirmasi Password</label><input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md" /></div>
-            <div><label className="block text-sm font-medium text-gray-700 mb-1">Role</label><select name="role" value={formData.role} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md"><option value="user">User</option><option value="admin">Admin</option><option value="pimpinan">Pimpinan</option><option value="agen">Agen</option></select></div>
+            <div><label className="block text-sm font-medium text-gray-700 mb-1">Role</label><select name="role" value={formData.role} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-md"><option value="user">User</option><option value="admin">Admin</option><option value="agen">Agen</option></select></div>
             <div className="flex justify-end gap-4 pt-4 border-t mt-4"><button type="button" onClick={onClose} className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</button><button type="submit" className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Simpan</button></div>
         </form>
     );
@@ -202,7 +202,7 @@ const ManajemenUserPage = () => {
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-6">
                  <StatsCard title="Total User" value={userList.length.toString()} color="blue" icon={<UserGroupIcon className="h-6 w-6" />} />
                  <StatsCard title="Admin" value={userList.filter(u => u.role === 'admin').length.toString()} color="red" icon={<AdminIcon className="h-6 w-6" />} />
-                 <StatsCard title="Pimpinan" value={userList.filter(u => u.role === 'pimpinan').length.toString()} color="purple" icon={<ManagerIcon className="h-6 w-6" />} />
+                 {/* <StatsCard title="Pimpinan" value={userList.filter(u => u.role === 'pimpinan').length.toString()} color="purple" icon={<ManagerIcon className="h-6 w-6" />} /> */}
                  <StatsCard title="User" value={userList.filter(u => u.role === 'user').length.toString()} color="green" icon={<StaffIcon className="h-6 w-6" />} />
                  <StatsCard title="Agen" value={userList.filter(u => u.role === 'agen').length.toString()} color="orange" icon={<AgenIcon className="h-6 w-6" />} />
             </div>
@@ -216,7 +216,7 @@ const ManajemenUserPage = () => {
                     <div className="flex items-center gap-4 w-full md:w-auto">
                         <input type="text" placeholder="Cari user..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="p-2 border border-gray-300 rounded-md w-full md:w-64" />
                         <select value={filterRole} onChange={e => setFilterRole(e.target.value)} className="p-2 border border-gray-300 rounded-md">
-                            <option>Semua</option><option>user</option><option>admin</option><option>pimpinan</option><option>agen</option>
+                            <option>Semua</option><option>user</option><option>admin</option><option>agen</option>
                         </select>
                     </div>
                 </div>

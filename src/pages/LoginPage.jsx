@@ -57,7 +57,6 @@ const LoginPage = () => {
     try {
       // Gunakan apiClient yang sudah dikonfigurasi
       const response = await apiClient.post('/auth/login', loginPayload);
-
       const { token, user } = response.data;
 
       if (!token || !user) {

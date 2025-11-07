@@ -1,10 +1,10 @@
 // src/pages/LoginPage.jsx
 
-import { useState, useEffect, useContext } from 'react'; // 1. Import useContext
+import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import apiClient from '../api/axios'; // Pastikan menggunakan apiClient
-import { AuthContext } from '../context/AuthProvider'; // 2. Import AuthContext
+import apiClient from '../api/axios';
+import { AuthContext } from '../context/AuthProvider'; // Pastikan import ini ada
 
 // Komponen FeatureListItem tidak berubah...
 const FeatureListItem = ({ children }) => (
@@ -19,7 +19,8 @@ FeatureListItem.propTypes = {
 
 
 const LoginPage = () => {
-  const { setToken } = useContext(AuthContext); // 3. Ambil fungsi setToken dari context
+  // 1. UBAH DI SINI: Ambil 'token' juga dari context
+  const { token, setToken } = useContext(AuthContext); 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
@@ -28,6 +29,38 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+
+  // ===================================================================
+  // 2. BLOK TAMBAHAN: Cek status login saat komponen dimuat
+  useEffect(() => {
+    // Kalo 'token' ada di context, berarti user sudah login
+    if (token) {
+      // Kita perlu tau dia role-nya apa. Ambil dari localStorage
+      const storedUser = localStorage.getItem('user');
+      let targetPath = '/user/dashboard'; // Path default kalo ada masalah
+
+      if (storedUser) {
+        try {
+          const user = JSON.parse(storedUser);
+          if (user.role === 'admin') {
+            targetPath = '/admin/dashboard';
+          } else if (user.role === 'user') {
+            targetPath = '/user/dashboard';
+          } else if (user.role === 'agen') {
+            targetPath = '/agen/dashboard';
+          }
+        } catch (e) {
+          console.error("Gagal parse user dari localStorage saat redirect:", e);
+        }
+      }
+      
+      // Redirect user ke dashboard-nya. 
+      // 'replace: true' PENTING! Ini mencegah user "back" ke halaman login
+      navigate(targetPath, { replace: true });
+    }
+  }, [token, navigate]); // dependency: jalan kalo 'token' atau 'navigate' berubah
+  // ===================================================================
+
 
   useEffect(() => {
     const rememberedUser = localStorage.getItem('pegadaian_remember');
@@ -55,7 +88,6 @@ const LoginPage = () => {
     };
 
     try {
-      // Gunakan apiClient yang sudah dikonfigurasi
       const response = await apiClient.post('/auth/login', loginPayload);
       const { token, user } = response.data;
 
@@ -63,12 +95,10 @@ const LoginPage = () => {
         throw new Error("Respons tidak valid dari server.");
       }
 
-      // Simpan ke localStorage
       localStorage.setItem('authToken', token);
       localStorage.setItem('user', JSON.stringify(user));
       
-      // 4. Perbarui state global di AuthContext
-      setToken(token);
+      setToken(token); // Update state global
 
       if (rememberMe) {
         localStorage.setItem('pegadaian_remember', username);
@@ -79,14 +109,15 @@ const LoginPage = () => {
       setSuccess(`Login berhasil! Mengarahkan ke dashboard...`);
       
       setTimeout(() => {
+        // 3. TAMBAHAN: Kasih 'replace: true' di sini juga
         if (user.role === 'admin') {
-          navigate('/admin/dashboard');
+          navigate('/admin/dashboard', { replace: true });
         } else if (user.role === 'user') {
-          navigate('/user/dashboard');
+          navigate('/user/dashboard', { replace: true });
         }else if (user.role === 'agen') { 
-          navigate('/agen/dashboard');
+          navigate('/agen/dashboard', { replace: true });
         } else {
-          navigate('/login');
+          navigate('/login', { replace: true }); // Fallback
         }
       }, 1500);
 
@@ -99,7 +130,8 @@ const LoginPage = () => {
     }
   };
 
-  // ... sisa kode JSX tidak berubah
+  // Kalo user BELUM login (token-nya null), useEffect di atas 
+  // ngga akan redirect, jadi form ini bakal tetep tampil.
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-800 via-green-600 to-teal-500 p-4">
       {loading && (
